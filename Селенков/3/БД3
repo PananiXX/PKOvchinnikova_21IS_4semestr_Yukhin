@@ -1,0 +1,37 @@
+
+CREATE TABLE IF NOT EXISTS projects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    discipline VARCHAR(100),
+    status VARCHAR(50),
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Создание таблицы технологий
+CREATE TABLE IF NOT EXISTS technologies (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL
+);
+
+-- Создание таблицы лога активности
+CREATE TABLE IF NOT EXISTS activity_log (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+    action VARCHAR(20) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Создание индексов для ускорения запросов
+CREATE INDEX IF NOT EXISTS idx_projects_discipline ON projects(discipline);
+CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
+CREATE INDEX IF NOT EXISTS idx_technologies_project_id ON technologies(project_id);
+CREATE INDEX IF NOT EXISTS idx_activity_log_timestamp ON activity_log(timestamp);
+
+-- Проверка созданных таблиц
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+ORDER BY table_name;
