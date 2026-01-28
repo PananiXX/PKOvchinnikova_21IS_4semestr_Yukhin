@@ -1,0 +1,101 @@
+-- CREATE DATABASE "21ис" WITH OWNER = postgres ENCODING = 'UTF8';
+
+-- Подключение к БД (автоматически в pgAdmin)
+-- \c "21ис"
+
+-- Удаление существующих таблиц (опционально)
+DROP TABLE IF EXISTS activity_log CASCADE;
+DROP TABLE IF EXISTS coauthors CASCADE;
+DROP TABLE IF EXISTS records CASCADE;
+
+-- Таблица записей
+CREATE TABLE records (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    type VARCHAR(100) NOT NULL,
+    year INTEGER NOT NULL CHECK (year >= 2000 AND year <= 2030),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    description TEXT,
+    file_path VARCHAR(500)
+);
+
+COMMENT ON TABLE records IS 'Основная таблица записей портфолио';
+COMMENT ON COLUMN records.title IS 'Название записи';
+COMMENT ON COLUMN records.type IS 'Тип записи (статья, книга и т.д.)';
+COMMENT ON COLUMN records.year IS 'Год создания';
+COMMENT ON COLUMN records.description IS 'Описание в формате Markdown';
+
+-- Таблица соавторов
+CREATE TABLE coauthors (
+    id SERIAL PRIMARY KEY,
+    record_id INTEGER NOT NULL REFERENCES records(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL
+);
+
+COMMENT ON TABLE coauthors IS 'Таблица соавторов записей';
+COMMENT ON COLUMN coauthors.record_id IS 'Ссылка на запись';
+COMMENT ON COLUMN coauthors.name IS 'Имя соавтора';
+
+-- Таблица активности
+CREATE TABLE activity_log (
+    id SERIAL PRIMARY KEY,
+    action VARCHAR(100) NOT NULL,
+    record_id INTEGER,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    details TEXT
+);
+
+COMMENT ON TABLE activity_log IS 'Лог действий пользователей';
+COMMENT ON COLUMN activity_log.action IS 'Тип действия (CREATE, UPDATE, DELETE и т.д.)';
+COMMENT ON COLUMN activity_log.record_id IS 'ID связанной записи';
+COMMENT ON COLUMN activity_log.details IS 'Детали действия';
+
+-- Индексы для ускорения запросов
+CREATE INDEX idx_records_type ON records(type);
+CREATE INDEX idx_records_year ON records(year);
+CREATE INDEX idx_records_created_at ON records(created_at);
+CREATE INDEX idx_coauthors_record_id ON coauthors(record_id);
+CREATE INDEX idx_activity_log_record_id ON activity_log(record_id);
+CREATE INDEX idx_activity_log_timestamp ON activity_log(timestamp);
+
+-- Триггер для автоматического обновления updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_records_updated_at 
+    BEFORE UPDATE ON records 
+    FOR EACH ROW 
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Пример тестовых данных (опционально)
+INSERT INTO records (title, type, year, description) VALUES
+('Исследование алгоритмов машинного обучения', 'Исследование', 2023, '## Аннотация\nИсследование современных алгоритмов ML...'),
+('Разработка веб-приложения для управления проектами', 'Проект', 2022, '> Веб-приложение на Django и React'),
+('Научная статья по кибербезопасности', 'Статья', 2024, '```python\n# Пример кода\nimport security_lib\n```');
+
+INSERT INTO coauthors (record_id, name) VALUES
+(1, 'Иванов И.И.'),
+(1, 'Петров П.П.'),
+(2, 'Сидоров С.С.');
+
+INSERT INTO activity_log (action, record_id, details) VALUES
+('CREATE', 1, 'Создана запись: Исследование алгоритмов машинного обучения'),
+('CREATE', 2, 'Создана запись: Разработка веб-приложения'),
+('ADD_COAUTHOR', 1, 'Добавлен соавтор: Иванов И.И.');
+
+-- Проверка созданных таблиц
+SELECT 
+    table_name, 
+    table_type
+FROM 
+    information_schema.tables 
+WHERE 
+    table_schema = 'public'
+ORDER BY 
+    table_name;
