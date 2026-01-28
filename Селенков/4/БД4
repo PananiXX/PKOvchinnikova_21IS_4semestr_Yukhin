@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS достижения (
+    id SERIAL PRIMARY KEY,
+    название TEXT NOT NULL,
+    дата DATE NOT NULL,
+    тип TEXT NOT NULL,
+    уровень TEXT NOT NULL,
+    описание TEXT
+);
+
+-- Индекс для ускорения сортировки
+CREATE INDEX IF NOT EXISTS idx_дата ON достижения(дата DESC);
+
+-- Проверка
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name = 'достижения';
