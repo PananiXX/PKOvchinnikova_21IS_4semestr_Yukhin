@@ -1,0 +1,66 @@
+-- Создание базы данных (если создаете из psql)
+-- CREATE DATABASE "21ис" OWNER postgres ENCODING 'UTF8' TEMPLATE template0;
+
+-- Подключитесь к базе 21ис и выполните:
+
+CREATE TABLE entries (
+    id SERIAL PRIMARY KEY,
+    название TEXT NOT NULL,
+    тип TEXT NOT NULL,
+    дата DATE NOT NULL,
+    описание TEXT,
+    соавторы TEXT
+);
+
+CREATE TABLE keywords (
+    id SERIAL PRIMARY KEY,
+    keyword TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE entry_keywords (
+    entry_id INTEGER REFERENCES entries(id) ON DELETE CASCADE,
+    keyword_id INTEGER REFERENCES keywords(id) ON DELETE CASCADE,
+    PRIMARY KEY (entry_id, keyword_id)
+);
+
+CREATE TABLE achievements (
+    id SERIAL PRIMARY KEY,
+    название TEXT UNIQUE NOT NULL,
+    описание TEXT
+);
+
+CREATE TABLE user_achievements (
+    user_id INTEGER DEFAULT 1,
+    achievement_id INTEGER REFERENCES achievements(id) ON DELETE CASCADE,
+    получено TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, achievement_id)
+);
+
+CREATE TABLE competencies (
+    id SERIAL PRIMARY KEY,
+    название TEXT NOT NULL,
+    категория TEXT
+);
+
+CREATE TABLE entry_competencies (
+    entry_id INTEGER REFERENCES entries(id) ON DELETE CASCADE,
+    competency_id INTEGER REFERENCES competencies(id) ON DELETE CASCADE,
+    уровень INTEGER CHECK (уровень >= 1 AND уровень <= 5),
+    PRIMARY KEY (entry_id, competency_id)
+);
+
+CREATE TABLE goals (
+    id SERIAL PRIMARY KEY,
+    описание TEXT NOT NULL,
+    тип TEXT NOT NULL,
+    цель_значение INTEGER,
+    текущее_значение INTEGER DEFAULT 0,
+    завершено BOOLEAN DEFAULT FALSE
+);
+
+INSERT INTO achievements (название, описание) VALUES
+('Первый шаг', 'Создана первая запись'),
+('Командный игрок', 'Три и более записи с соавторами'),
+('Разносторонний', 'Записи минимум трёх разных типов'),
+('Плодотворный год', 'Три и более записи за один календарный год'),
+('Словобог', 'Суммарный объём описаний превысил 5000 символов');
