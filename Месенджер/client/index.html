@@ -19,6 +19,8 @@
             --server-bg: #2f364a;
             --message-hover: #2b3348;
             --toast-bg: #2b3348;
+            --scrollbar-thumb: #3a4055;
+            --scrollbar-track: #1a1e2a;
         }
     </style>
     <style>
@@ -27,6 +29,31 @@
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* Стили для полосы прокрутки */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        /* Для Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
         }
 
         body {
@@ -39,16 +66,193 @@
             transition: background-color 0.3s;
         }
 
+        /* Экран входа/регистрации */
+        .auth-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-screen::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .auth-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            position: relative;
+            z-index: 2;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: white;
+            transform: rotate(10deg);
+            transition: 0.3s;
+        }
+
+        .auth-logo:hover {
+            transform: rotate(0deg) scale(1.1);
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-muted);
+        }
+
+        .auth-tab.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .auth-input-group {
+            position: relative;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .auth-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
+        }
+
+        .auth-input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .auth-button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        .auth-button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(124, 77, 255, 0.3);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .auth-link {
+            color: var(--accent-primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Основное приложение (изначально скрыто) */
         .app-window {
             width: 1400px;
             height: 900px;
             background: var(--bg-secondary);
             border-radius: 12px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            display: flex;
+            display: none;
             overflow: hidden;
             border: 1px solid var(--border-color);
             transition: all 0.3s;
+        }
+
+        .app-window.visible {
+            display: flex;
         }
 
         .servers-panel {
@@ -80,6 +284,7 @@
             position: relative;
             background-size: cover;
             background-position: center;
+            overflow: hidden;
         }
 
         .server-icon:hover {
@@ -365,10 +570,6 @@
             position: relative;
             overflow: hidden;
             transition: none;
-        }
-
-        .message-avatar:hover {
-            opacity: 1;
         }
 
         .status-badge {
@@ -1159,17 +1360,100 @@
             border-color: var(--accent-primary);
             color: var(--accent-primary);
         }
+
+        .pinned-message {
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding: 8px 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pinned-message small {
+            color: var(--text-muted);
+            font-size: 11px;
+            display: block;
+        }
+
+        .empty-state {
+            color: var(--text-muted);
+            text-align: center;
+            padding: 50px;
+        }
+
+        .server-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
+    <!-- Экран входа/регистрации -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">💬</div>
+                <div class="auth-title">QuickChat</div>
+                <div class="auth-subtitle">Общайся с друзьями и коллегами</div>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">Вход</div>
+                <div class="auth-tab" onclick="switchAuthTab('register')">Регистрация</div>
+            </div>
+            
+            <div id="loginForm" class="auth-form">
+                <div class="auth-input-group">
+                    <span class="auth-input-icon">👤</span>
+                    <input type="text" class="auth-input" id="loginUsername" placeholder="Имя пользователя" value="Иван Петров">
+                </div>
+                <div class="auth-input-group">
+                    <span class="auth-input-icon">🔑</span>
+                    <input type="password" class="auth-input" id="loginPassword" placeholder="Пароль" value="password123">
+                </div>
+                <button class="auth-button" onclick="login()">Войти</button>
+            </div>
+            
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <div class="auth-input-group">
+                    <span class="auth-input-icon">👤</span>
+                    <input type="text" class="auth-input" id="regName" placeholder="Полное имя">
+                </div>
+                <div class="auth-input-group">
+                    <span class="auth-input-icon">📧</span>
+                    <input type="email" class="auth-input" id="regEmail" placeholder="Email">
+                </div>
+                <div class="auth-input-group">
+                    <span class="auth-input-icon">📞</span>
+                    <input type="tel" class="auth-input" id="regPhone" placeholder="Телефон">
+                </div>
+                <div class="auth-input-group">
+                    <span class="auth-input-icon">🔑</span>
+                    <input type="password" class="auth-input" id="regPassword" placeholder="Пароль">
+                </div>
+                <div class="auth-input-group">
+                    <span class="auth-input-icon">🔑</span>
+                    <input type="password" class="auth-input" id="regConfirmPassword" placeholder="Подтвердите пароль">
+                </div>
+                <button class="auth-button" onclick="register()">Зарегистрироваться</button>
+            </div>
+            
+            <div class="auth-footer">
+                <span class="auth-link" onclick="switchAuthTab('login')">Уже есть аккаунт?</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основное приложение -->
     <div class="app-window" id="app">
         <!-- Левая панель - серверы -->
-        <div class="servers-panel">
-            <div class="server-icon active" data-server="dms" onclick="switchServer('dms', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/456/456212.png');"></div>
-            <div class="server-icon" data-server="21is" onclick="switchServer('21is', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3135/3135715.png');"></div>
-            <div class="server-icon" data-server="news" onclick="switchServer('news', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/2965/2965567.png');"></div>
-            <div class="server-icon" data-server="cs2" onclick="switchServer('cs2', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3670/3670223.png');"></div>
-            <div class="server-icon" data-server="dota2" onclick="switchServer('dota2', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/2593/2593646.png');"></div>
+        <div class="servers-panel" id="serversPanel">
+            <div class="server-icon active" data-server="dms" onclick="switchServer('dms', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/1828/1828850.png');"></div>
+            <div class="server-icon" data-server="21is" onclick="switchServer('21is', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3135/3135768.png');"></div>
+            <div class="server-icon" data-server="news" onclick="switchServer('news', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3135/3135736.png');"></div>
+            <div class="server-icon" data-server="cs2" onclick="switchServer('cs2', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3465/3465153.png');"></div>
+            <div class="server-icon" data-server="dota2" onclick="switchServer('dota2', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3069/3069160.png');"></div>
             <div class="server-divider"></div>
             <div class="server-icon" onclick="openModal('createServerModal')" style="background-image: url('https://cdn-icons-png.flaticon.com/128/1828/1828817.png');"></div>
         </div>
@@ -1395,6 +1679,60 @@
         </div>
     </div>
 
+    <!-- Модальное окно создания сервера -->
+    <div class="modal" id="createServerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать сервер</h2>
+                <button class="modal-close" onclick="closeModal('createServerModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label">Название сервера</label>
+                <input type="text" class="modal-input" id="serverNameInput" placeholder="например, Мой сервер">
+                
+                <label class="modal-label">Выберите иконку</label>
+                <select class="modal-input" id="serverIconSelect">
+                    <option value="📚">📚 Учеба</option>
+                    <option value="💻">💻 Разработка</option>
+                    <option value="🎮">🎮 Игры</option>
+                    <option value="🎵">🎵 Музыка</option>
+                    <option value="🎬">🎬 Кино</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('createServerModal')">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="createServer()">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания канала -->
+    <div class="modal" id="createChannelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать канал</h2>
+                <button class="modal-close" onclick="closeModal('createChannelModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label">Название канала</label>
+                <input type="text" class="modal-input" id="channelNameInput" placeholder="например, общий">
+                
+                <label class="modal-label">Тип канала</label>
+                <select class="modal-input" id="channelTypeSelect">
+                    <option value="text">📝 Текстовый</option>
+                    <option value="voice">🎤 Голосовой</option>
+                </select>
+                
+                <label class="modal-label">Описание</label>
+                <textarea class="modal-input" rows="3" id="channelDescInput" placeholder="Опишите назначение канала"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('createChannelModal')">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="createChannel()">Создать</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Модальное окно загрузки файла -->
     <div class="modal" id="fileUploadModal">
         <div class="modal-content">
@@ -1419,9 +1757,11 @@
 
     <script>
         // ==================== ДАННЫЕ СЕРВЕРОВ ====================
-        const servers = {
-            'dms': {
+        const servers = [
+            {
+                id: 'dms',
                 name: 'Личные сообщения',
+                icon: 'https://cdn-icons-png.flaticon.com/128/1828/1828850.png',
                 meta: 'все диалоги',
                 type: 'dm',
                 channels: [
@@ -1429,8 +1769,10 @@
                 ],
                 members: []
             },
-            '21is': {
+            {
+                id: '21is',
                 name: '21 ИС',
+                icon: 'https://cdn-icons-png.flaticon.com/128/3135/3135768.png',
                 meta: 'группа 21ИС-24 • 28 чел',
                 type: 'server',
                 channels: [
@@ -1481,11 +1823,18 @@
                         { id: 12, author: 'Алексей Смирнов', time: '15.02', text: 'Я почти закончил первую главу', avatar: '2', reactions: { '👍': 2, '❤️': 1 } },
                         { id: 13, author: 'Елена Попова', time: '15.02', text: 'А у меня проблемы с бэкендом', avatar: '13', reactions: {} },
                         { id: 14, author: 'Павел Волков', time: '15.02', text: 'Могу помочь, пиши', avatar: '5', reactions: { '👍': 3 } }
+                    ],
+                    'exams': [
+                        { id: 15, author: 'Иван Петров', time: '14.02', text: 'Ребята, когда экзамен по математике?', avatar: '1', reactions: { '👍': 2 } },
+                        { id: 16, author: 'Мария Сидорова', time: '14.02', text: '27 мая в расписании', avatar: '11', reactions: { '❤️': 1 } },
+                        { id: 17, author: 'Учебный Бот', time: '14.02', text: 'Напоминаю: до экзамена осталось 2 недели!', avatar: '19', reactions: { '👍': 5 } }
                     ]
                 }
             },
-            'news': {
+            {
+                id: 'news',
                 name: 'Новости Москва',
+                icon: 'https://cdn-icons-png.flaticon.com/128/3135/3135736.png',
                 meta: 'городской портал • 15K чел',
                 type: 'server',
                 channels: [
@@ -1508,11 +1857,22 @@
                         { id: 102, author: 'Анна Королева', time: '10:17', text: 'А где именно?', avatar: '25', reactions: {} },
                         { id: 103, author: 'Новости24', time: '10:18', text: 'От Кремля до Садового кольца', avatar: '22', reactions: { '👍': 5 } },
                         { id: 104, author: 'Погодный Бот', time: '10:20', text: '🌧️ Сегодня в Москве +5°C, небольшой дождь', avatar: '23', reactions: {} }
+                    ],
+                    'incidents': [
+                        { id: 105, author: 'Новости24', time: '09:00', text: 'ДТП на МКАД, движение затруднено', avatar: '22', reactions: { '👍': 8 } }
+                    ],
+                    'transport': [
+                        { id: 106, author: 'Дептранс', time: '08:30', text: '🚇 На зеленой ветке задержки движения', avatar: '24', reactions: { '👍': 15 } }
+                    ],
+                    'culture': [
+                        { id: 107, author: 'Анна Королева', time: 'вчера', text: 'В Третьяковке открылась новая выставка', avatar: '25', reactions: { '❤️': 7 } }
                     ]
                 }
             },
-            'cs2': {
+            {
+                id: 'cs2',
                 name: 'CS2 RU',
+                icon: 'https://cdn-icons-png.flaticon.com/128/3465/3465153.png',
                 meta: 'игровое сообщество • 25K чел',
                 type: 'server',
                 channels: [
@@ -1535,11 +1895,19 @@
                         { id: 202, author: 'NoobMaster', time: '11:22', text: 'А Mirage починили?', avatar: '31', reactions: { '👍': 3 } },
                         { id: 203, author: 'CS2_Rus', time: '11:23', text: 'Да, текстуры поправили', avatar: '27', reactions: {} },
                         { id: 204, author: 'G2_Support', time: '11:25', text: 'Ищем двоих для турнира, нужен 2k+ elo', avatar: '30', reactions: { '👍': 7 } }
+                    ],
+                    'lfg': [
+                        { id: 205, author: 'ProPlayer', time: '10:00', text: 'Нужен слот в команду', avatar: '32', reactions: {} }
+                    ],
+                    'tactics': [
+                        { id: 206, author: 's1mple', time: 'вчера', text: 'Новая тактика на Mirage', avatar: '28', reactions: { '👍': 45 } }
                     ]
                 }
             },
-            'dota2': {
+            {
+                id: 'dota2',
                 name: 'Dota 2 RU',
+                icon: 'https://cdn-icons-png.flaticon.com/128/3069/3069160.png',
                 meta: 'Dota 2 сообщество • 32K чел',
                 type: 'server',
                 channels: [
@@ -1560,10 +1928,16 @@
                         { id: 301, author: 'DotaBuff', time: '12:00', text: '📊 Новая мета: Керри-веник снова топ', avatar: '33', reactions: { '👍': 15, '❤️': 3 } },
                         { id: 302, author: 'Yatoro', time: '12:05', text: 'Согласен, сейчас имба', avatar: '34', reactions: { '👍': 8 } },
                         { id: 303, author: 'KunkkaMain', time: '12:10', text: 'Нужен саппорт на 5к+ ммр', avatar: '36', reactions: {} }
+                    ],
+                    'mm': [
+                        { id: 304, author: 'SupportGod', time: '11:00', text: 'Ищу тиммейтов', avatar: '37', reactions: {} }
+                    ],
+                    'guides': [
+                        { id: 305, author: 'Collapse', time: 'вчера', text: 'Гайд по игре на Mars', avatar: '35', reactions: { '👍': 23 } }
                     ]
                 }
             }
-        };
+        ];
 
         // ==================== ЛИЧНЫЕ СООБЩЕНИЯ ====================
         const directMessages = {};
@@ -1571,9 +1945,9 @@
         // Инициализация личных сообщений
         function initDirectMessages() {
             const allUsers = [];
-            for (let serverId in servers) {
-                if (serverId !== 'dms') {
-                    servers[serverId].members.forEach(m => {
+            servers.forEach(server => {
+                if (server.id !== 'dms') {
+                    server.members.forEach(m => {
                         if (m.name !== 'Иван Петров' && !allUsers.find(u => u.name === m.name)) {
                             allUsers.push(m);
                             
@@ -1602,7 +1976,7 @@
                         }
                     });
                 }
-            }
+            });
         }
 
         initDirectMessages();
@@ -1644,22 +2018,22 @@
                 '26': 'https://randomuser.me/api/portraits/women/10.jpg',
                 
                 // Боты
-                '19': 'https://cdn-icons-png.flaticon.com/128/4712/4712109.png',
-                '20': 'https://cdn-icons-png.flaticon.com/128/4712/4712035.png',
-                '22': 'https://cdn-icons-png.flaticon.com/128/724/724664.png',
-                '23': 'https://cdn-icons-png.flaticon.com/128/4814/4814268.png',
-                '27': 'https://cdn-icons-png.flaticon.com/128/3670/3670223.png',
-                '33': 'https://cdn-icons-png.flaticon.com/128/2593/2593646.png',
+                '19': 'https://cdn-icons-png.flaticon.com/512/4712/4712109.png',
+                '20': 'https://cdn-icons-png.flaticon.com/512/4712/4712035.png',
+                '22': 'https://cdn-icons-png.flaticon.com/512/724/724664.png',
+                '23': 'https://cdn-icons-png.flaticon.com/512/4814/4814268.png',
+                '27': 'https://cdn-icons-png.flaticon.com/512/3670/3670223.png',
+                '33': 'https://cdn-icons-png.flaticon.com/512/2593/2593646.png',
                 
                 // Специальные
-                '21': 'https://cdn-icons-png.flaticon.com/128/3135/3135715.png',
-                '24': 'https://cdn-icons-png.flaticon.com/128/3063/3063155.png'
+                '21': 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                '24': 'https://cdn-icons-png.flaticon.com/512/3063/3063155.png'
             };
             
             return avatarMap[id] || 'https://randomuser.me/api/portraits/men/1.jpg';
         }
 
-        // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
+        // ==================== АВТОРИЗАЦИЯ ====================
         let currentUser = {
             name: 'Иван Петров',
             username: 'ivan_petrov',
@@ -1671,14 +2045,99 @@
             photos: ['1', '2']
         };
 
-        let currentServer = '21is';
-        let currentChannel = 'general';
-        let currentDM = null;
-        let selectedMessageId = null;
-        let infoPanelVisible = true;
-        let messageIdCounter = 20000;
-        let botIntervals = [];
-        let selectedProfileUser = null;
+        function switchAuthTab(tab) {
+            const loginTab = document.querySelectorAll('.auth-tab')[0];
+            const registerTab = document.querySelectorAll('.auth-tab')[1];
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginForm.style.display = 'flex';
+                registerForm.style.display = 'none';
+            } else {
+                loginTab.classList.remove('active');
+                registerTab.classList.add('active');
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'flex';
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (username && password) {
+                currentUser.name = username;
+                document.getElementById('currentUserName').textContent = username;
+                
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('app').classList.add('visible');
+                
+                showToast(`Добро пожаловать, ${username}!`);
+                renderServers();
+                renderServer();
+            } else {
+                showToast('Введите имя и пароль');
+            }
+        }
+
+        function register() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirmPassword').value;
+            
+            if (!name || !email || !phone || !password) {
+                showToast('Заполните все поля');
+                return;
+            }
+            
+            if (password !== confirm) {
+                showToast('Пароли не совпадают');
+                return;
+            }
+            
+            currentUser.name = name;
+            currentUser.username = email.split('@')[0];
+            currentUser.phone = phone;
+            
+            document.getElementById('currentUserName').textContent = name;
+            
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('app').classList.add('visible');
+            
+            showToast(`Добро пожаловать, ${name}!`);
+            renderServers();
+            renderServer();
+        }
+
+        // ==================== РЕНДЕРИНГ СЕРВЕРОВ ====================
+        function renderServers() {
+            const panel = document.getElementById('serversPanel');
+            panel.innerHTML = '';
+            
+            servers.forEach(server => {
+                const icon = document.createElement('div');
+                icon.className = `server-icon ${server.id === 'dms' ? 'active' : ''}`;
+                icon.setAttribute('data-server', server.id);
+                icon.setAttribute('onclick', `switchServer('${server.id}', this)`);
+                icon.style.backgroundImage = `url('${server.icon}')`;
+                panel.appendChild(icon);
+            });
+            
+            const divider = document.createElement('div');
+            divider.className = 'server-divider';
+            panel.appendChild(divider);
+            
+            const addIcon = document.createElement('div');
+            addIcon.className = 'server-icon';
+            addIcon.setAttribute('onclick', 'openModal("createServerModal")');
+            addIcon.style.backgroundImage = 'url("https://cdn-icons-png.flaticon.com/128/1828/1828817.png")';
+            panel.appendChild(addIcon);
+        }
 
         // ==================== ТЕМЫ ====================
         function setTheme(theme) {
@@ -1699,6 +2158,8 @@
                     root.style.setProperty('--server-bg', '#2f364a');
                     root.style.setProperty('--message-hover', '#2b3348');
                     root.style.setProperty('--toast-bg', '#2b3348');
+                    root.style.setProperty('--scrollbar-thumb', '#3a4055');
+                    root.style.setProperty('--scrollbar-track', '#1a1e2a');
                     break;
                 case 'dark':
                     root.style.setProperty('--bg-primary', '#000000');
@@ -1714,6 +2175,8 @@
                     root.style.setProperty('--server-bg', '#1a1a1a');
                     root.style.setProperty('--message-hover', '#1a1a1a');
                     root.style.setProperty('--toast-bg', '#222222');
+                    root.style.setProperty('--scrollbar-thumb', '#333333');
+                    root.style.setProperty('--scrollbar-track', '#111111');
                     break;
                 case 'light':
                     root.style.setProperty('--bg-primary', '#f0f2f5');
@@ -1729,6 +2192,8 @@
                     root.style.setProperty('--server-bg', '#e4e6eb');
                     root.style.setProperty('--message-hover', '#e4e6eb');
                     root.style.setProperty('--toast-bg', '#ffffff');
+                    root.style.setProperty('--scrollbar-thumb', '#cccccc');
+                    root.style.setProperty('--scrollbar-track', '#f5f5f5');
                     break;
                 case 'monochrome':
                     root.style.setProperty('--bg-primary', '#1a1a1a');
@@ -1744,6 +2209,8 @@
                     root.style.setProperty('--server-bg', '#3a3a3a');
                     root.style.setProperty('--message-hover', '#4a4a4a');
                     root.style.setProperty('--toast-bg', '#3a3a3a');
+                    root.style.setProperty('--scrollbar-thumb', '#555555');
+                    root.style.setProperty('--scrollbar-track', '#222222');
                     break;
                 case 'blue':
                     root.style.setProperty('--bg-primary', '#0a1929');
@@ -1759,6 +2226,8 @@
                     root.style.setProperty('--server-bg', '#132f4c');
                     root.style.setProperty('--message-hover', '#1f4b6e');
                     root.style.setProperty('--toast-bg', '#132f4c');
+                    root.style.setProperty('--scrollbar-thumb', '#1e4b6e');
+                    root.style.setProperty('--scrollbar-track', '#0a1929');
                     break;
             }
             
@@ -1767,13 +2236,16 @@
         }
 
         // ==================== БОТЫ ====================
+        let botIntervals = [];
+
         function startBotConversations() {
             botIntervals.forEach(interval => clearInterval(interval));
             botIntervals = [];
             
             botIntervals.push(setInterval(() => {
-                if (currentServer === '21is' && currentChannel === 'general') {
-                    const bot = servers['21is'].members.find(m => m.isBot);
+                const server = servers.find(s => s.id === '21is');
+                if (currentServer === '21is' && currentChannel) {
+                    const bot = server.members.find(m => m.isBot);
                     if (bot) {
                         const messages = [
                             'Кто пойдет на пару?',
@@ -1782,14 +2254,15 @@
                             'Преподаватель просил принести тетради'
                         ];
                         const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-                        addBotMessage('21is', 'general', bot.name, randomMsg, bot.avatar);
+                        addBotMessage('21is', currentChannel, bot.name, randomMsg, bot.avatar);
                     }
                 }
             }, 25000));
 
             botIntervals.push(setInterval(() => {
-                if (currentServer === 'news' && currentChannel === 'general') {
-                    const bot = servers['news'].members.find(m => m.isBot);
+                const server = servers.find(s => s.id === 'news');
+                if (currentServer === 'news' && currentChannel) {
+                    const bot = server.members.find(m => m.isBot);
                     if (bot) {
                         const messages = [
                             '🌧️ Сегодня в Москве +5°C, небольшой дождь',
@@ -1798,14 +2271,15 @@
                             '⚡ Новые тарифы на ЖКХ с апреля'
                         ];
                         const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-                        addBotMessage('news', 'general', bot.name, randomMsg, bot.avatar);
+                        addBotMessage('news', currentChannel, bot.name, randomMsg, bot.avatar);
                     }
                 }
             }, 20000));
 
             botIntervals.push(setInterval(() => {
-                if (currentServer === 'cs2' && currentChannel === 'general') {
-                    const bot = servers['cs2'].members.find(m => m.isBot);
+                const server = servers.find(s => s.id === 'cs2');
+                if (currentServer === 'cs2' && currentChannel) {
+                    const bot = server.members.find(m => m.isBot);
                     if (bot) {
                         const messages = [
                             '🎮 Новый скин для AK-47 вышел!',
@@ -1814,14 +2288,15 @@
                             '⚙️ Балансный патч на следующей неделе'
                         ];
                         const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-                        addBotMessage('cs2', 'general', bot.name, randomMsg, bot.avatar);
+                        addBotMessage('cs2', currentChannel, bot.name, randomMsg, bot.avatar);
                     }
                 }
             }, 23000));
 
             botIntervals.push(setInterval(() => {
-                if (currentServer === 'dota2' && currentChannel === 'general') {
-                    const bot = servers['dota2'].members.find(m => m.isBot);
+                const server = servers.find(s => s.id === 'dota2');
+                if (currentServer === 'dota2' && currentChannel) {
+                    const bot = server.members.find(m => m.isBot);
                     if (bot) {
                         const messages = [
                             '🎮 Новый герой выпущен!',
@@ -1830,15 +2305,16 @@
                             '🎁 Новый сет для Pudge в сокровищнице'
                         ];
                         const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-                        addBotMessage('dota2', 'general', bot.name, randomMsg, bot.avatar);
+                        addBotMessage('dota2', currentChannel, bot.name, randomMsg, bot.avatar);
                     }
                 }
             }, 27000));
         }
 
         function addBotMessage(serverId, channelId, botName, text, avatar) {
-            if (!servers[serverId].messages[channelId]) {
-                servers[serverId].messages[channelId] = [];
+            const server = servers.find(s => s.id === serverId);
+            if (!server.messages[channelId]) {
+                server.messages[channelId] = [];
             }
             
             const newMsg = {
@@ -1850,7 +2326,7 @@
                 reactions: {}
             };
             
-            servers[serverId].messages[channelId].push(newMsg);
+            server.messages[channelId].push(newMsg);
             
             if (currentServer === serverId && currentChannel === channelId) {
                 renderMessages();
@@ -1904,8 +2380,9 @@
             
             area.innerHTML = '';
             currentUser.photos.forEach((photo, index) => {
+                const url = photo.startsWith('http') ? photo : getAvatarUrl(photo);
                 area.innerHTML += `
-                    <div class="photo-upload-item" style="background-image: url('${getAvatarUrl(photo)}');" onclick="removeUserPhoto(${index})"></div>
+                    <div class="photo-upload-item" style="background-image: url('${url}');" onclick="removeUserPhoto(${index})"></div>
                 `;
             });
             
@@ -1924,14 +2401,16 @@
         }
 
         // ==================== ПРОФИЛИ ====================
+        let selectedProfileUser = null;
+
         function showUserProfile(username) {
             let user = null;
             
             if (username === currentUser.name) {
                 user = currentUser;
             } else {
-                for (let serverId in servers) {
-                    const found = servers[serverId].members.find(m => m.name === username);
+                for (let server of servers) {
+                    const found = server.members.find(m => m.name === username);
                     if (found) {
                         user = found;
                         break;
@@ -2008,7 +2487,7 @@
                     showToast(`Добавлена реакция ${reaction}`);
                 }
             } else {
-                const server = servers[currentServer];
+                const server = servers.find(s => s.id === currentServer);
                 const chatKey = currentChannel;
                 const msg = server.messages[chatKey].find(m => m.id === messageId);
                 
@@ -2029,8 +2508,15 @@
         }
 
         // ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
+        let currentServer = 'dms';
+        let currentChannel = null;
+        let currentDM = null;
+        let selectedMessageId = null;
+        let infoPanelVisible = true;
+        let messageIdCounter = 20000;
+
         function renderServer() {
-            const server = servers[currentServer];
+            const server = servers.find(s => s.id === currentServer);
             document.getElementById('workspaceName').textContent = server.name;
             document.getElementById('workspaceMeta').textContent = server.meta;
 
@@ -2041,15 +2527,15 @@
                 dmList.innerHTML = '';
                 
                 const allUsers = [];
-                for (let serverId in servers) {
-                    if (serverId !== 'dms') {
-                        servers[serverId].members.forEach(m => {
+                servers.forEach(s => {
+                    if (s.id !== 'dms') {
+                        s.members.forEach(m => {
                             if (m.name !== currentUser.name && !allUsers.find(u => u.name === m.name)) {
                                 allUsers.push(m);
                             }
                         });
                     }
-                }
+                });
                 
                 allUsers.sort((a, b) => a.name.localeCompare(b.name));
                 
@@ -2123,7 +2609,7 @@
                 document.getElementById('infoTopic').textContent = 'Личный разговор';
                 
                 if (!dmData.messages || dmData.messages.length === 0) {
-                    container.innerHTML = '<div class="empty-state" style="color: var(--text-muted); text-align: center; padding: 50px;">Напишите первое сообщение</div>';
+                    container.innerHTML = '<div class="empty-state">Напишите первое сообщение</div>';
                     return;
                 }
                 
@@ -2133,8 +2619,8 @@
                     const isOwn = msg.author === 'Вы';
                     
                     let avatar = null;
-                    for (let serverId in servers) {
-                        const user = servers[serverId].members.find(m => m.name === msg.author);
+                    for (let server of servers) {
+                        const user = server.members.find(m => m.name === msg.author);
                         if (user) {
                             avatar = getAvatarUrl(user.avatar);
                             break;
@@ -2182,9 +2668,9 @@
                 
                 container.innerHTML = html;
             } else {
-                const server = servers[currentServer];
+                const server = servers.find(s => s.id === currentServer);
                 if (!server || !server.messages) {
-                    container.innerHTML = '<div class="empty-state" style="color: var(--text-muted); text-align: center; padding: 50px;">Нет сообщений</div>';
+                    container.innerHTML = '<div class="empty-state">Нет сообщений</div>';
                     return;
                 }
                 
@@ -2196,7 +2682,7 @@
                 document.getElementById('infoTopic').textContent = channel?.topic || '';
 
                 if (messages.length === 0) {
-                    container.innerHTML = '<div class="empty-state" style="color: var(--text-muted); text-align: center; padding: 50px;">Нет сообщений</div>';
+                    container.innerHTML = '<div class="empty-state">Нет сообщений</div>';
                     return;
                 }
 
@@ -2206,7 +2692,7 @@
                     const member = server.members.find(m => m.name === msg.author);
                     const avatarUrl = getAvatarUrl(msg.avatar || member?.avatar);
                     const avatarStyle = `background-image: url('${avatarUrl}');`;
-                    const status = member?.status || 'offline';
+                    const status = member?.status || 'online';
                     
                     let reactionsHtml = '';
                     if (msg.reactions && Object.keys(msg.reactions).length > 0) {
@@ -2255,7 +2741,7 @@
         }
 
         function updateMembersList() {
-            const server = servers[currentServer];
+            const server = servers.find(s => s.id === currentServer);
             if (!server || currentServer === 'dms') {
                 document.getElementById('membersList').innerHTML = '<div class="member-item">Выберите сервер</div>';
                 document.getElementById('onlineCount').textContent = '0';
@@ -2296,12 +2782,13 @@
             document.querySelectorAll('.server-icon').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             
+            const server = servers.find(s => s.id === serverId);
             currentServer = serverId;
-            currentChannel = serverId === 'dms' ? null : 'general';
+            currentChannel = serverId === 'dms' ? null : server.channels[0].id;
             currentDM = null;
             
             renderServer();
-            showToast(`Переключен на ${servers[serverId].name}`);
+            showToast(`Переключен на ${server.name}`);
         }
 
         function switchChannel(channelId, element) {
@@ -2370,7 +2857,7 @@
                 
                 showToast('Сообщение отправлено');
             } else {
-                const server = servers[currentServer];
+                const server = servers.find(s => s.id === currentServer);
                 let chatKey = currentChannel;
                 
                 if (!server.messages[chatKey]) {
@@ -2399,7 +2886,7 @@
             if (currentServer === 'dms' && currentDM) {
                 msg = directMessages[currentDM].messages.find(m => m.id === messageId);
             } else {
-                const server = servers[currentServer];
+                const server = servers.find(s => s.id === currentServer);
                 const chatKey = currentChannel;
                 msg = server.messages[chatKey].find(m => m.id === messageId);
             }
@@ -2457,7 +2944,7 @@
             if (currentServer === 'dms' && currentDM) {
                 msg = directMessages[currentDM].messages.find(m => m.id === selectedMessageId);
             } else {
-                const server = servers[currentServer];
+                const server = servers.find(s => s.id === currentServer);
                 const chatKey = currentChannel;
                 msg = server.messages[chatKey].find(m => m.id === selectedMessageId);
             }
@@ -2482,7 +2969,7 @@
                     showToast('Нельзя удалить чужое сообщение');
                 }
             } else {
-                const server = servers[currentServer];
+                const server = servers.find(s => s.id === currentServer);
                 const chatKey = currentChannel;
                 const index = server.messages[chatKey].findIndex(m => m.id === selectedMessageId);
                 const msg = server.messages[chatKey][index];
@@ -2512,7 +2999,7 @@
             if (currentServer === 'dms' && currentDM) {
                 msg = directMessages[currentDM].messages.find(m => m.id === selectedMessageId);
             } else {
-                const server = servers[currentServer];
+                const server = servers.find(s => s.id === currentServer);
                 const chatKey = currentChannel;
                 msg = server.messages[chatKey].find(m => m.id === selectedMessageId);
             }
@@ -2586,6 +3073,66 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('show');
+        }
+
+        function createServer() {
+            const name = document.getElementById('serverNameInput').value;
+            
+            if (name) {
+                const newServer = {
+                    id: 'server_' + Date.now(),
+                    name: name,
+                    icon: 'https://cdn-icons-png.flaticon.com/128/1828/1828850.png',
+                    meta: 'новый сервер • 1 чел',
+                    type: 'server',
+                    channels: [
+                        { id: 'general', name: 'общий', topic: 'Основной чат' }
+                    ],
+                    members: [
+                        { name: currentUser.name, username: currentUser.username, phone: currentUser.phone, bio: currentUser.bio, status: 'online', role: 'создатель', avatar: currentUser.avatar }
+                    ],
+                    messages: {
+                        'general': []
+                    }
+                };
+                
+                servers.push(newServer);
+                
+                renderServers();
+                showToast(`Сервер "${name}" создан!`);
+                closeModal('createServerModal');
+                document.getElementById('serverNameInput').value = '';
+                
+                const newServerIcon = document.querySelector(`[data-server="${newServer.id}"]`);
+                if (newServerIcon) {
+                    switchServer(newServer.id, newServerIcon);
+                }
+            }
+        }
+
+        function createChannel() {
+            const name = document.getElementById('channelNameInput').value;
+            const type = document.getElementById('channelTypeSelect').value;
+            const desc = document.getElementById('channelDescInput').value;
+            
+            if (name) {
+                const server = servers.find(s => s.id === currentServer);
+                const channelId = name.toLowerCase().replace(/\s+/g, '_');
+                
+                server.channels.push({
+                    id: channelId,
+                    name: name,
+                    topic: desc || `Обсуждение ${name}`
+                });
+                
+                server.messages[channelId] = [];
+                
+                renderServer();
+                showToast(`Канал "${name}" создан!`);
+                closeModal('createChannelModal');
+                document.getElementById('channelNameInput').value = '';
+                document.getElementById('channelDescInput').value = '';
+            }
         }
 
         function attachFile() {
@@ -2697,6 +3244,7 @@
 
         // Запуск
         window.onload = function() {
+            renderServers();
             renderServer();
             startBotConversations();
             
