@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuickChat Desktop Pro</title>
+    <style id="theme-style">
+        :root {
+            --bg-primary: #1a1e2a;
+            --bg-secondary: #1f2533;
+            --bg-tertiary: #252b3b;
+            --bg-hover: #2b3348;
+            --accent-primary: #7c4dff;
+            --accent-hover: #946aff;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e6ff;
+            --text-muted: #8e9ac0;
+            --border-color: #2d3548;
+            --server-bg: #2f364a;
+            --message-hover: #2b3348;
+            --toast-bg: #2b3348;
+        }
+    </style>
     <style>
         * {
             margin: 0;
@@ -13,63 +30,67 @@
         }
 
         body {
-            background: #1a1e2a;
+            background: var(--bg-primary);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            transition: background-color 0.3s;
         }
 
-        /* Основной контейнер (как окно приложения) */
         .app-window {
             width: 1400px;
             height: 900px;
-            background: #1f2533;
+            background: var(--bg-secondary);
             border-radius: 12px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             display: flex;
             overflow: hidden;
-            border: 1px solid #2d3445;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
         }
 
-        /* Левая панель - серверы */
         .servers-panel {
             width: 72px;
-            background: #1a1e2a;
+            background: var(--bg-primary);
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 12px 0;
-            border-right: 1px solid #2a3040;
+            border-right: 1px solid var(--border-color);
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .server-icon {
             width: 48px;
             height: 48px;
             border-radius: 24px;
-            background: #2f364a;
+            background: var(--server-bg);
             margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #e0e6ff;
+            color: var(--text-secondary);
             font-weight: bold;
             font-size: 20px;
             cursor: pointer;
             transition: 0.2s;
             position: relative;
+            background-size: cover;
+            background-position: center;
         }
 
         .server-icon:hover {
             border-radius: 16px;
-            background: #7c4dff;
+            filter: brightness(1.2);
         }
 
         .server-icon.active {
             border-radius: 16px;
-            background: #7c4dff;
+            filter: brightness(1.3);
+            border: 2px solid var(--accent-primary);
         }
 
         .server-icon.active::before {
@@ -78,67 +99,83 @@
             left: -12px;
             width: 4px;
             height: 24px;
-            background: #ffffff;
+            background: var(--text-primary);
             border-radius: 0 4px 4px 0;
         }
 
         .server-divider {
             width: 32px;
             height: 2px;
-            background: #2d3447;
+            background: var(--border-color);
             margin: 8px 0;
+            flex-shrink: 0;
         }
 
-        /* Средняя панель - каналы и контакты */
         .channels-panel {
             width: 260px;
-            background: #1f2535;
+            background: var(--bg-tertiary);
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #2d3548;
+            border-right: 1px solid var(--border-color);
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
         .channels-header {
             padding: 20px 16px;
-            border-bottom: 1px solid #2d3548;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .channels-header:hover {
+            background: var(--bg-hover);
         }
 
         .workspace-name {
             font-size: 18px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
 
         .workspace-meta {
             font-size: 13px;
-            color: #8e9ac0;
+            color: var(--text-muted);
         }
 
         .channels-search {
             padding: 12px 16px;
+            flex-shrink: 0;
         }
 
         .search-box {
-            background: #2b3348;
+            background: var(--bg-hover);
             border: none;
             border-radius: 6px;
             padding: 8px 12px;
             width: 100%;
-            color: #e0e6ff;
+            color: var(--text-primary);
             font-size: 14px;
             outline: none;
         }
 
         .search-box::placeholder {
-            color: #6b789c;
+            color: var(--text-muted);
+        }
+
+        .channels-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
         }
 
         .channels-category {
             padding: 16px 16px 4px;
             display: flex;
             justify-content: space-between;
-            color: #8e9ac0;
+            color: var(--text-muted);
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
@@ -147,7 +184,7 @@
         }
 
         .channels-category:hover {
-            color: #e0e6ff;
+            color: var(--text-secondary);
         }
 
         .channel-item {
@@ -157,30 +194,30 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #b2bcdb;
+            color: var(--text-secondary);
             font-size: 15px;
             cursor: pointer;
             transition: 0.1s;
         }
 
         .channel-item:hover {
-            background: #2b334a;
-            color: #ffffff;
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
         .channel-item.active {
-            background: #7c4dff;
-            color: #ffffff;
+            background: var(--accent-primary);
+            color: var(--text-primary);
         }
 
         .channel-item .hash {
             font-size: 20px;
             font-weight: 300;
-            color: #6b789c;
+            color: var(--text-muted);
         }
 
         .channel-item.active .hash {
-            color: #ffffff;
+            color: var(--text-primary);
         }
 
         .channel-badge {
@@ -190,24 +227,29 @@
             font-size: 11px;
             padding: 2px 6px;
             border-radius: 10px;
+            display: none;
         }
 
-        /* Правая панель - основное содержимое */
+        .channel-badge.active {
+            display: inline-block;
+        }
+
         .main-panel {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #252b3b;
+            background: var(--bg-secondary);
+            overflow: hidden;
         }
 
-        /* Верхняя панель чата */
         .chat-header {
             height: 64px;
             padding: 0 20px;
-            border-bottom: 1px solid #2d3548;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
         .chat-info {
@@ -219,12 +261,12 @@
         .chat-name {
             font-size: 18px;
             font-weight: 600;
-            color: #ffffff;
+            color: var(--text-primary);
         }
 
         .chat-topic {
             font-size: 13px;
-            color: #8e9ac0;
+            color: var(--text-muted);
             max-width: 300px;
             white-space: nowrap;
             overflow: hidden;
@@ -239,26 +281,26 @@
         .action-btn {
             background: none;
             border: none;
-            color: #a5b2da;
+            color: var(--text-muted);
             font-size: 20px;
             cursor: pointer;
             padding: 4px;
             border-radius: 4px;
+            transition: 0.2s;
         }
 
         .action-btn:hover {
-            color: #ffffff;
-            background: #2f3750;
+            color: var(--text-primary);
+            background: var(--bg-hover);
         }
 
-        /* Область сообщений */
         .messages-area {
             flex: 1;
             overflow-y: auto;
             padding: 20px 0;
             display: flex;
             flex-direction: column;
-            background: #1f2533;
+            background: var(--bg-tertiary);
         }
 
         .date-divider {
@@ -274,14 +316,14 @@
             top: 50%;
             width: 100%;
             height: 1px;
-            background: #2d3548;
+            background: var(--border-color);
             z-index: 1;
         }
 
         .date-text {
-            background: #1f2533;
+            background: var(--bg-tertiary);
             padding: 0 12px;
-            color: #8e9ac0;
+            color: var(--text-muted);
             font-size: 12px;
             font-weight: 600;
             position: relative;
@@ -297,21 +339,52 @@
         }
 
         .message:hover {
-            background: #2b3348;
+            background: var(--message-hover);
+        }
+
+        .message-avatar-wrapper {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            cursor: pointer;
         }
 
         .message-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #7c4dff, #b47cff);
+            background-size: cover;
+            background-position: center;
+            background-color: var(--accent-primary);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            transition: none;
         }
+
+        .message-avatar:hover {
+            opacity: 1;
+        }
+
+        .status-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-tertiary);
+            z-index: 3;
+        }
+
+        .status-badge.online { background: #3ba55d; }
+        .status-badge.idle { background: #faa81a; }
+        .status-badge.offline { background: #6b789c; }
 
         .message-content {
             flex: 1;
@@ -322,22 +395,29 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 4px;
+            flex-wrap: wrap;
         }
 
         .message-author {
             font-weight: 600;
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 15px;
+            cursor: pointer;
+        }
+
+        .message-author:hover {
+            text-decoration: underline;
+            color: var(--accent-primary);
         }
 
         .message-time {
             font-size: 12px;
-            color: #6b789c;
+            color: var(--text-muted);
         }
 
-        .message-badge {
-            background: #7c4dff;
-            color: white;
+        .role-badge {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
             font-size: 10px;
             padding: 2px 6px;
             border-radius: 4px;
@@ -345,46 +425,50 @@
         }
 
         .message-text {
-            color: #e0e6ff;
+            color: var(--text-secondary);
             font-size: 15px;
             line-height: 1.5;
             word-wrap: break-word;
-        }
-
-        .message-media {
-            margin-top: 8px;
-            max-width: 400px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #2d3548;
-        }
-
-        .message-media img {
-            width: 100%;
-            display: block;
-            cursor: pointer;
-        }
-
-        .message-reply {
-            background: #2b3348;
-            border-left: 4px solid #7c4dff;
-            padding: 8px 12px;
-            border-radius: 6px;
             margin-bottom: 8px;
-            font-size: 13px;
-            color: #b2bcdb;
         }
 
-        .message-reply-author {
-            font-weight: 600;
-            color: #ffffff;
-            margin-right: 8px;
+        .message-reactions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .reaction-badge {
+            background: var(--bg-hover);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding: 2px 8px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .reaction-badge:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .reaction-badge .count {
+            font-size: 11px;
+            opacity: 0.8;
         }
 
         .message-footer {
             display: flex;
-            gap: 12px;
-            margin-top: 8px;
+            gap: 8px;
+            margin-top: 4px;
             opacity: 0;
             transition: 0.1s;
         }
@@ -396,41 +480,48 @@
         .message-footer button {
             background: none;
             border: none;
-            color: #8e9ac0;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 13px;
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 4px;
+            transition: 0.2s;
         }
 
         .message-footer button:hover {
-            background: #3f485f;
-            color: #ffffff;
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
-        /* Боковая панель информации */
         .info-panel {
             width: 280px;
-            background: #1f2535;
-            border-left: 1px solid #2d3548;
+            background: var(--bg-tertiary);
+            border-left: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            transition: 0.3s;
+            overflow: hidden;
+            flex-shrink: 0;
         }
 
         .info-panel.collapsed {
-            display: none;
+            width: 0;
+            min-width: 0;
+            opacity: 0;
+            overflow: hidden;
         }
 
         .info-header {
             padding: 20px;
-            border-bottom: 1px solid #2d3548;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .info-header h3 {
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 16px;
             font-weight: 600;
         }
@@ -438,18 +529,30 @@
         .info-close {
             background: none;
             border: none;
-            color: #8e9ac0;
+            color: var(--text-muted);
             font-size: 18px;
             cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .info-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .info-scrollable {
+            flex: 1;
+            overflow-y: auto;
         }
 
         .info-section {
             padding: 16px 20px;
-            border-bottom: 1px solid #2d3548;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .info-section h4 {
-            color: #8e9ac0;
+            color: var(--text-muted);
             font-size: 12px;
             text-transform: uppercase;
             margin-bottom: 12px;
@@ -462,42 +565,83 @@
             gap: 12px;
             padding: 8px 0;
             cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .member-item:hover {
+            background: var(--bg-hover);
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 0 -12px;
+        }
+
+        .member-avatar-wrapper {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .member-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
         }
 
         .member-status {
+            position: absolute;
+            bottom: 0;
+            right: 0;
             width: 10px;
             height: 10px;
             border-radius: 50%;
+            border: 2px solid var(--bg-tertiary);
         }
 
-        .member-status.online {
-            background: #3ba55d;
-        }
+        .member-status.online { background: #3ba55d; }
+        .member-status.idle { background: #faa81a; }
+        .member-status.offline { background: #6b789c; }
 
-        .member-status.idle {
-            background: #faa81a;
-        }
-
-        .member-status.offline {
-            background: #6b789c;
+        .member-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
 
         .member-name {
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 15px;
-            flex: 1;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .member-role {
-            color: #8e9ac0;
-            font-size: 12px;
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* Поле ввода сообщения */
         .message-input-area {
             padding: 20px;
-            background: #1f2533;
-            border-top: 1px solid #2d3548;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .input-toolbar {
@@ -510,22 +654,23 @@
         .toolbar-btn {
             background: none;
             border: none;
-            color: #a5b2da;
+            color: var(--text-muted);
             font-size: 18px;
             cursor: pointer;
             padding: 4px;
             border-radius: 4px;
+            transition: 0.2s;
         }
 
         .toolbar-btn:hover {
-            background: #2b3348;
-            color: #ffffff;
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
         .input-wrapper {
             display: flex;
             gap: 12px;
-            background: #2b3348;
+            background: var(--bg-hover);
             border-radius: 8px;
             padding: 8px 12px;
             align-items: flex-end;
@@ -535,7 +680,7 @@
             flex: 1;
             background: none;
             border: none;
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 15px;
             resize: none;
             max-height: 150px;
@@ -545,11 +690,11 @@
         }
 
         .input-wrapper textarea::placeholder {
-            color: #6b789c;
+            color: var(--text-muted);
         }
 
         .send-btn {
-            background: #7c4dff;
+            background: var(--accent-primary);
             border: none;
             width: 36px;
             height: 36px;
@@ -560,21 +705,21 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: 0.1s;
+            transition: 0.2s;
             flex-shrink: 0;
         }
 
         .send-btn:hover {
-            background: #946aff;
+            background: var(--accent-hover);
+            transform: scale(1.05);
         }
 
-        /* Контекстное меню */
         .context-menu {
             position: fixed;
-            background: #2b3348;
+            background: var(--bg-hover);
             border-radius: 8px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            border: 1px solid #3f4a63;
+            border: 1px solid var(--border-color);
             padding: 8px 0;
             min-width: 200px;
             z-index: 1000;
@@ -587,25 +732,26 @@
 
         .context-menu-item {
             padding: 8px 16px;
-            color: #e0e6ff;
+            color: var(--text-secondary);
             font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: 0.2s;
         }
 
         .context-menu-item:hover {
-            background: #3f4a63;
+            background: var(--accent-primary);
+            color: white;
         }
 
         .context-menu-divider {
             height: 1px;
-            background: #3f4a63;
+            background: var(--border-color);
             margin: 8px 0;
         }
 
-        /* Модальное окно */
         .modal {
             position: fixed;
             top: 0;
@@ -625,40 +771,61 @@
         }
 
         .modal-content {
-            background: #252b3b;
+            background: var(--bg-secondary);
             border-radius: 12px;
             width: 500px;
             max-width: 90%;
-            border: 1px solid #3f4a63;
+            border: 1px solid var(--border-color);
+            animation: modalSlideIn 0.3s;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
             padding: 20px;
-            border-bottom: 1px solid #2d3548;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
         }
 
         .modal-header h2 {
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 20px;
         }
 
         .modal-close {
             background: none;
             border: none;
-            color: #8e9ac0;
+            color: var(--text-muted);
             font-size: 24px;
             cursor: pointer;
+            padding: 0 8px;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
         .modal-body {
             padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
         }
 
         .modal-footer {
             padding: 20px;
-            border-top: 1px solid #2d3548;
+            border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: flex-end;
             gap: 12px;
@@ -670,68 +837,327 @@
             border: none;
             font-size: 14px;
             cursor: pointer;
+            transition: 0.2s;
         }
 
         .modal-btn-primary {
-            background: #7c4dff;
+            background: var(--accent-primary);
             color: white;
         }
 
+        .modal-btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
         .modal-btn-secondary {
-            background: #2b3348;
-            color: #e0e6ff;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--border-color);
         }
 
         .modal-input {
             width: 100%;
             padding: 12px;
-            background: #2b3348;
-            border: 1px solid #3f4a63;
+            background: var(--bg-hover);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 15px;
             margin-bottom: 16px;
         }
 
-        /* Загрузка файлов */
-        .file-drop-area {
-            border: 2px dashed #3f4a63;
-            border-radius: 8px;
-            padding: 40px;
+        .modal-input:focus {
+            border-color: var(--accent-primary);
+            outline: none;
+        }
+
+        .modal-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background-size: cover;
+            background-position: center;
+            background-color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .profile-info {
             text-align: center;
-            color: #8e9ac0;
+            margin-bottom: 20px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .profile-username {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .profile-phone {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .profile-bio {
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 16px;
+            background: var(--bg-hover);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .profile-photos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .profile-photo {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            background: var(--bg-hover);
+            background-size: cover;
+            background-position: center;
             cursor: pointer;
             transition: 0.2s;
         }
 
-        .file-drop-area.dragover {
-            border-color: #7c4dff;
-            background: rgba(124, 77, 255, 0.1);
+        .profile-photo:hover {
+            filter: brightness(1.1);
         }
 
-        /* Статус-бар */
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .theme-option {
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .theme-option:hover {
+            filter: brightness(1.2);
+        }
+
         .status-bar {
-            background: #1a1e2a;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1400px;
+            background: var(--bg-primary);
             padding: 4px 16px;
             display: flex;
             align-items: center;
             gap: 16px;
             font-size: 12px;
-            color: #8e9ac0;
-            border-top: 1px solid #2d3548;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            border-radius: 0 0 12px 12px;
+            z-index: 100;
         }
 
-        .status-indicator {
+        .current-user {
+            margin-left: auto;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 8px;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
-        .status-dot {
+        .current-user:hover {
+            background: var(--bg-hover);
+        }
+
+        .current-user-avatar-wrapper {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+
+        .current-user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .current-user-status {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #3ba55d;
+            border: 2px solid var(--bg-primary);
+        }
+
+        .current-user-status.online { background: #3ba55d; }
+        .current-user-status.idle { background: #faa81a; }
+        .current-user-status.offline { background: #6b789c; }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: var(--toast-bg);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            animation: slideIn 0.3s;
+            z-index: 3000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .file-drop-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .file-drop-area.dragover {
+            border-color: var(--accent-primary);
+            background: rgba(124, 77, 255, 0.1);
+        }
+
+        .avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-upload-btn {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .avatar-upload-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .photo-upload-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .photo-upload-item {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            background: var(--bg-hover);
+            border: 2px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.2s;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .photo-upload-item:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
         }
     </style>
 </head>
@@ -739,198 +1165,68 @@
     <div class="app-window" id="app">
         <!-- Левая панель - серверы -->
         <div class="servers-panel">
-            <div class="server-icon active">📚</div>
-            <div class="server-icon">💻</div>
-            <div class="server-icon">🎓</div>
-            <div class="server-icon">👥</div>
-            <div class="server-icon">📊</div>
+            <div class="server-icon active" data-server="dms" onclick="switchServer('dms', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/456/456212.png');"></div>
+            <div class="server-icon" data-server="21is" onclick="switchServer('21is', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3135/3135715.png');"></div>
+            <div class="server-icon" data-server="news" onclick="switchServer('news', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/2965/2965567.png');"></div>
+            <div class="server-icon" data-server="cs2" onclick="switchServer('cs2', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/3670/3670223.png');"></div>
+            <div class="server-icon" data-server="dota2" onclick="switchServer('dota2', this)" style="background-image: url('https://cdn-icons-png.flaticon.com/128/2593/2593646.png');"></div>
             <div class="server-divider"></div>
-            <div class="server-icon">➕</div>
+            <div class="server-icon" onclick="openModal('createServerModal')" style="background-image: url('https://cdn-icons-png.flaticon.com/128/1828/1828817.png');"></div>
         </div>
 
         <!-- Средняя панель - каналы -->
         <div class="channels-panel">
-            <div class="channels-header">
-                <div class="workspace-name">Образовательный портал</div>
-                <div class="workspace-meta">21ИС-24 • 15 участников</div>
+            <div class="channels-header" onclick="openModal('workspaceModal')">
+                <div class="workspace-name" id="workspaceName">Личные сообщения</div>
+                <div class="workspace-meta" id="workspaceMeta">все диалоги</div>
             </div>
 
             <div class="channels-search">
-                <input type="text" class="search-box" placeholder="Поиск или начало чата...">
+                <input type="text" class="search-box" id="searchBox" placeholder="Поиск...">
             </div>
 
-            <div class="channels-category">
-                <span>📢 КАНАЛЫ</span>
-                <span>+</span>
-            </div>
+            <div class="channels-scrollable" id="channelsScrollable">
+                <div class="channels-category" onclick="openModal('createChannelModal')">
+                    <span>📢 КАНАЛЫ</span>
+                    <span>+</span>
+                </div>
 
-            <div class="channel-item active">
-                <span class="hash">#</span>
-                <span>общий</span>
-            </div>
-            <div class="channel-item">
-                <span class="hash">#</span>
-                <span>проекты</span>
-                <span class="channel-badge">3</span>
-            </div>
-            <div class="channel-item">
-                <span class="hash">#</span>
-                <span>вопросы</span>
-            </div>
-            <div class="channel-item">
-                <span class="hash">#</span>
-                <span>offtopic</span>
-            </div>
+                <div id="channelsList"></div>
 
-            <div class="channels-category">
-                <span>👥 ЛИЧНЫЕ СООБЩЕНИЯ</span>
-                <span>+</span>
-            </div>
+                <div class="channels-category">
+                    <span>👥 ЛИЧНЫЕ СООБЩЕНИЯ</span>
+                </div>
 
-            <div class="channel-item">
-                <span>🟢</span>
-                <span>Иван Петров</span>
-            </div>
-            <div class="channel-item">
-                <span>🟡</span>
-                <span>Мария Сидорова</span>
-            </div>
-            <div class="channel-item">
-                <span>⚫</span>
-                <span>Анна Иванова</span>
+                <div id="dmList"></div>
             </div>
         </div>
 
         <!-- Основная панель -->
         <div class="main-panel">
-            <!-- Шапка чата -->
             <div class="chat-header">
                 <div class="chat-info">
-                    <span class="chat-name"># общий</span>
-                    <span class="chat-topic">Обсуждение учебных вопросов и проектов</span>
+                    <span class="chat-name" id="currentChannel">Общий чат</span>
+                    <span class="chat-topic" id="currentTopic">Личные сообщения</span>
                 </div>
                 <div class="chat-actions">
-                    <button class="action-btn">🔔</button>
-                    <button class="action-btn">📌</button>
-                    <button class="action-btn">👥</button>
-                    <button class="action-btn">🔍</button>
-                    <button class="action-btn" onclick="toggleInfoPanel()">📋</button>
+                    <button class="action-btn" onclick="toggleNotifications()" id="notifBtn">🔔</button>
+                    <button class="action-btn" onclick="openPinned()">📌</button>
+                    <button class="action-btn" onclick="openMembers()">👥</button>
+                    <button class="action-btn" onclick="openModal('settingsModal')">⚙️</button>
+                    <button class="action-btn" onclick="toggleInfoPanel()" id="infoBtn">📋</button>
                 </div>
             </div>
 
-            <!-- Сообщения -->
-            <div class="messages-area" id="messagesArea">
-                <div class="date-divider">
-                    <span class="date-text">19 января 2026</span>
-                </div>
+            <div class="messages-area" id="messagesArea"></div>
 
-                <!-- Сообщение 1 -->
-                <div class="message" id="msg1">
-                    <div class="message-avatar">И</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Иван Петров</span>
-                            <span class="message-time">14:30</span>
-                            <span class="message-badge">АДМИН</span>
-                        </div>
-                        <div class="message-text">
-                            Всем привет! Начинаем работу над проектом. У кого есть идеи?
-                        </div>
-                        <div class="message-footer">
-                            <button onclick="replyToMessage('msg1')">💬 Ответить</button>
-                            <button onclick="addReaction('👍')">👍</button>
-                            <button onclick="addReaction('❤️')">❤️</button>
-                            <button onclick="showMessageMenu(event)">⋯</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сообщение с ответом -->
-                <div class="message">
-                    <div class="message-avatar">М</div>
-                    <div class="message-content">
-                        <div class="message-reply">
-                            <span class="message-reply-author">Иван Петров</span>
-                            У кого есть идеи?
-                        </div>
-                        <div class="message-header">
-                            <span class="message-author">Мария Сидорова</span>
-                            <span class="message-time">14:32</span>
-                        </div>
-                        <div class="message-text">
-                            Давайте сделаем чат-бота для помощи студентам?
-                        </div>
-                        <div class="message-footer">
-                            <button>💬 Ответить</button>
-                            <button>👍 3</button>
-                            <button>❤️ 1</button>
-                            <button>⋯</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сообщение с изображением -->
-                <div class="message">
-                    <div class="message-avatar">А</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Алексей Смирнов</span>
-                            <span class="message-time">14:35</span>
-                        </div>
-                        <div class="message-text">
-                            Вот пример архитектуры, который я нашел
-                        </div>
-                        <div class="message-media">
-                            <img src="https://picsum.photos/400/300?random=1" alt="Архитектура" onclick="openImage(this.src)">
-                        </div>
-                        <div class="message-footer">
-                            <button>💬 Ответить</button>
-                            <button>👍 5</button>
-                            <button>📥 Скачать</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Системное сообщение -->
-                <div class="message">
-                    <div class="message-avatar">⚙️</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Система</span>
-                            <span class="message-time">14:40</span>
-                        </div>
-                        <div class="message-text">
-                            📌 Иван Петров закрепил сообщение "Всем привет! Начинаем работу над проектом"
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сообщение с файлом -->
-                <div class="message">
-                    <div class="message-avatar">Д</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Дмитрий Козлов</span>
-                            <span class="message-time">14:45</span>
-                        </div>
-                        <div class="message-text">
-                            📎 Техническое задание.pdf (2.4 MB)
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Поле ввода сообщения -->
             <div class="message-input-area">
                 <div class="input-toolbar">
-                    <button class="toolbar-btn">📎</button>
-                    <button class="toolbar-btn">@</button>
-                    <button class="toolbar-btn">📋</button>
-                    <button class="toolbar-btn">😊</button>
-                    <button class="toolbar-btn">⚙️</button>
+                    <button class="toolbar-btn" onclick="attachFile()">📎</button>
+                    <button class="toolbar-btn" onclick="mentionUser()">@</button>
+                    <button class="toolbar-btn" onclick="insertEmoji()">😊</button>
                 </div>
                 <div class="input-wrapper">
-                    <textarea placeholder="Напишите сообщение в #общий..." rows="1" id="messageInput"></textarea>
+                    <textarea placeholder="Напишите сообщение..." rows="1" id="messageInput" onkeydown="handleKeyDown(event)"></textarea>
                     <button class="send-btn" onclick="sendMessage()">➤</button>
                 </div>
             </div>
@@ -943,197 +1239,1199 @@
                 <button class="info-close" onclick="toggleInfoPanel()">×</button>
             </div>
 
-            <div class="info-section">
-                <h4>О КАНАЛЕ</h4>
-                <div style="color: #e0e6ff; font-size: 14px; line-height: 1.6;">
-                    <p>📌 <strong>Тема:</strong> Обсуждение учебных вопросов</p>
-                    <p>📅 <strong>Создан:</strong> 15.01.2026</p>
-                    <p>👥 <strong>Участников:</strong> 15</p>
-                    <p>📊 <strong>Сообщений:</strong> 2.3K</p>
+            <div class="info-scrollable">
+                <div class="info-section">
+                    <h4>О КАНАЛЕ</h4>
+                    <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;" id="channelInfo">
+                        <p>📌 <strong>Тема:</strong> <span id="infoTopic">Личные сообщения</span></p>
+                        <p>📅 <strong>Создан:</strong> 15.01.2026</p>
+                        <p>👥 <strong>Участников:</strong> <span id="memberCount">28</span></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="info-section">
-                <h4>УЧАСТНИКИ (15)</h4>
-                <div class="member-item">
-                    <span class="member-status online"></span>
-                    <span class="member-name">Иван Петров</span>
-                    <span class="member-role">админ</span>
+                <div class="info-section" id="membersSection">
+                    <h4>УЧАСТНИКИ (<span id="onlineCount">18</span>/<span id="totalMembers">28</span>)</h4>
+                    <div id="membersList"></div>
                 </div>
-                <div class="member-item">
-                    <span class="member-status online"></span>
-                    <span class="member-name">Мария Сидорова</span>
-                </div>
-                <div class="member-item">
-                    <span class="member-status idle"></span>
-                    <span class="member-name">Алексей Смирнов</span>
-                    <span class="member-role">модератор</span>
-                </div>
-                <div class="member-item">
-                    <span class="member-status online"></span>
-                    <span class="member-name">Дмитрий Козлов</span>
-                </div>
-                <div class="member-item">
-                    <span class="member-status offline"></span>
-                    <span class="member-name">Анна Иванова</span>
-                </div>
-            </div>
 
-            <div class="info-section">
-                <h4>ЗАКРЕПЛЕННЫЕ СООБЩЕНИЯ</h4>
-                <div style="color: #e0e6ff; font-size: 13px; padding: 8px 0;">
-                    📌 Правила чата
-                    <div style="color: #8e9ac0; font-size: 11px;">Иван Петров • 16.01</div>
-                </div>
-                <div style="color: #e0e6ff; font-size: 13px; padding: 8px 0;">
-                    📌 Ссылки на проекты
-                    <div style="color: #8e9ac0; font-size: 11px;">Мария Сидорова • 17.01</div>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h4>МЕДИА</h4>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
-                    <img src="https://picsum.photos/80/80?random=2" style="width: 100%; border-radius: 4px;">
-                    <img src="https://picsum.photos/80/80?random=3" style="width: 100%; border-radius: 4px;">
-                    <img src="https://picsum.photos/80/80?random=4" style="width: 100%; border-radius: 4px;">
-                    <img src="https://picsum.photos/80/80?random=5" style="width: 100%; border-radius: 4px;">
-                    <img src="https://picsum.photos/80/80?random=6" style="width: 100%; border-radius: 4px;">
-                    <img src="https://picsum.photos/80/80?random=7" style="width: 100%; border-radius: 4px;">
+                <div class="info-section">
+                    <h4>ЗАКРЕПЛЕННЫЕ СООБЩЕНИЯ</h4>
+                    <div id="pinnedMessages">
+                        <div class="pinned-message">📌 Правила чата <small>Иван Петров</small></div>
+                        <div class="pinned-message">📌 Важная информация <small>Мария Сидорова</small></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Статус-бар внизу окна -->
-    <div style="position: fixed; bottom: 0; left: 0; right: 0; width: 1400px; margin: 0 auto; left: 50%; transform: translateX(-50%);">
-        <div class="status-bar">
-            <div class="status-indicator">
-                <span class="status-dot"></span>
-                <span>Подключено к серверу</span>
+    <!-- Статус-бар -->
+    <div class="status-bar">
+        <div class="status-indicator" onclick="showConnectionInfo()">
+            <span class="status-dot" style="background: #3ba55d;"></span>
+            <span id="connectionStatus">Подключено</span>
+        </div>
+        <div>|</div>
+        <div>WebSocket: 🟢</div>
+        <div>|</div>
+        <div><span id="onlineUsers">18</span> онлайн</div>
+        <div>|</div>
+        <div>Пинг: <span id="ping">124</span> мс</div>
+        <div class="current-user" onclick="openModal('profileModal')">
+            <div class="current-user-avatar-wrapper">
+                <div class="current-user-avatar" id="currentUserAvatar" style="background-image: url('https://randomuser.me/api/portraits/men/1.jpg');"></div>
+                <div class="current-user-status online" id="currentUserStatus"></div>
             </div>
-            <div>|</div>
-            <div>WebSocket: 🟢 Активно</div>
-            <div>|</div>
-            <div>15 участников онлайн</div>
-            <div>|</div>
-            <div>Скорость: 124 мс</div>
-            <div style="margin-left: auto;">QuickChat Desktop Pro v2.0</div>
+            <span id="currentUserName">Иван Петров</span>
+            <span>▼</span>
         </div>
     </div>
 
     <!-- Контекстное меню -->
     <div class="context-menu" id="contextMenu">
-        <div class="context-menu-item">📋 Копировать текст</div>
-        <div class="context-menu-item">💬 Ответить</div>
-        <div class="context-menu-item">📎 Закрепить</div>
+        <div class="context-menu-item" onclick="copyMessage()">📋 Копировать</div>
+        <div class="context-menu-item" onclick="replyToMessage()">💬 Ответить</div>
         <div class="context-menu-divider"></div>
-        <div class="context-menu-item">✏️ Редактировать</div>
-        <div class="context-menu-item">🗑️ Удалить для всех</div>
-        <div class="context-menu-item">🗑️ Удалить для себя</div>
+        <div class="context-menu-item" onclick="addReactionFromMenu('👍')">👍 Поставить лайк</div>
+        <div class="context-menu-item" onclick="addReactionFromMenu('❤️')">❤️ Поставить сердечко</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" id="editMenuItem" onclick="editMessage()">✏️ Редактировать</div>
+        <div class="context-menu-item" id="deleteForAllMenuItem" onclick="deleteForAll()">🗑️ Удалить для всех</div>
+        <div class="context-menu-item" onclick="deleteForMe()">🗑️ Удалить для себя</div>
     </div>
 
-    <!-- Модальное окно создания канала -->
-    <div class="modal" id="createChannelModal">
+    <!-- Модальное окно профиля пользователя -->
+    <div class="modal" id="userProfileModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Создать канал</h2>
-                <button class="modal-close" onclick="closeModal('createChannelModal')">×</button>
+                <h2 id="profileModalTitle">Профиль пользователя</h2>
+                <button class="modal-close" onclick="closeModal('userProfileModal')">×</button>
             </div>
             <div class="modal-body">
-                <input type="text" class="modal-input" placeholder="Название канала">
-                <select class="modal-input">
-                    <option>Текстовый канал</option>
-                    <option>Голосовой канал</option>
-                </select>
-                <textarea class="modal-input" rows="3" placeholder="Описание (необязательно)"></textarea>
+                <div class="profile-avatar" id="profileAvatar"></div>
+                <div class="profile-info">
+                    <div class="profile-name" id="profileName">Иван Петров</div>
+                    <div class="profile-username" id="profileUsername">@ivan_petrov</div>
+                    <div class="profile-phone" id="profilePhone">📞 +7 (999) 123-45-67</div>
+                    <div class="profile-bio" id="profileBio">
+                        Студент группы 21ИС-24. Увлекаюсь программированием и играми.
+                    </div>
+                </div>
+                <h4 style="color: var(--text-primary); margin-bottom: 10px;">Фотографии</h4>
+                <div class="profile-photos" id="profilePhotos"></div>
             </div>
             <div class="modal-footer">
-                <button class="modal-btn modal-btn-secondary" onclick="closeModal('createChannelModal')">Отмена</button>
-                <button class="modal-btn modal-btn-primary">Создать</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('userProfileModal')">Закрыть</button>
+                <button class="modal-btn modal-btn-primary" id="startDMBtn" onclick="startDMFromProfile()">💬 Написать</button>
             </div>
         </div>
     </div>
 
+    <!-- Модальное окно профиля (редактирование) -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редактировать профиль</h2>
+                <button class="modal-close" onclick="closeModal('profileModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="avatar-upload">
+                    <div class="avatar-preview" id="avatarPreview"></div>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                    <button class="avatar-upload-btn" onclick="document.getElementById('avatarUpload').click()">Загрузить аватар</button>
+                </div>
+                
+                <label class="modal-label">Имя</label>
+                <input type="text" class="modal-input" id="usernameInput" value="Иван Петров">
+                
+                <label class="modal-label">Юзернейм</label>
+                <input type="text" class="modal-input" id="userUsernameInput" value="ivan_petrov">
+                
+                <label class="modal-label">Номер телефона</label>
+                <input type="text" class="modal-input" id="userPhoneInput" value="+7 (999) 123-45-67">
+                
+                <label class="modal-label">Статус</label>
+                <select class="modal-input" id="statusSelect">
+                    <option value="online">🟢 Онлайн</option>
+                    <option value="idle">🟡 Отошел</option>
+                    <option value="offline">⚫ Невидимка</option>
+                </select>
+                
+                <label class="modal-label">О себе</label>
+                <textarea class="modal-input" rows="3" id="userBioInput">Студент группы 21ИС-24. Увлекаюсь программированием и играми.</textarea>
+                
+                <label class="modal-label">Ваши фотографии</label>
+                <div class="photo-upload-area" id="userPhotosArea"></div>
+                <input type="file" id="photoUpload" accept="image/*" style="display: none;" multiple onchange="handlePhotosUpload(event)">
+                <button class="avatar-upload-btn" style="width: 100%; margin-top: 10px;" onclick="document.getElementById('photoUpload').click()">➕ Добавить фото</button>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('profileModal')">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="saveProfile()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно настроек темы -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Настройки</h2>
+                <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <h3 style="color: var(--text-primary); margin-bottom: 15px;">Тема оформления</h3>
+                <div class="theme-selector">
+                    <div class="theme-option" onclick="setTheme('default')" style="background: linear-gradient(135deg, #1a1e2a, #7c4dff); color: white;">Стандартная</div>
+                    <div class="theme-option" onclick="setTheme('dark')" style="background: #000000; color: white; border: 1px solid #333;">Черная</div>
+                    <div class="theme-option" onclick="setTheme('light')" style="background: #ffffff; color: black; border: 1px solid #ccc;">Белая</div>
+                    <div class="theme-option" onclick="setTheme('monochrome')" style="background: linear-gradient(135deg, #333, #666); color: white;">Черно-белая</div>
+                    <div class="theme-option" onclick="setTheme('blue')" style="background: linear-gradient(135deg, #0a1929, #1976d2); color: white;">Синяя</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('settingsModal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно загрузки файла -->
+    <div class="modal" id="fileUploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Загрузить файл</h2>
+                <button class="modal-close" onclick="closeModal('fileUploadModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-drop-area" id="fileDropArea" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)" onclick="selectFile()">
+                    <p>📁 Перетащите файл или кликните</p>
+                </div>
+                <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('fileUploadModal')">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        // Глобальные переменные
-        let currentUser = {
-            id: 1,
-            name: 'Иван Петров',
-            status: 'online'
+        // ==================== ДАННЫЕ СЕРВЕРОВ ====================
+        const servers = {
+            'dms': {
+                name: 'Личные сообщения',
+                meta: 'все диалоги',
+                type: 'dm',
+                channels: [
+                    { id: 'all', name: 'все диалоги', topic: 'Все личные сообщения' }
+                ],
+                members: []
+            },
+            '21is': {
+                name: '21 ИС',
+                meta: 'группа 21ИС-24 • 28 чел',
+                type: 'server',
+                channels: [
+                    { id: 'general', name: 'общий', topic: 'Основной чат группы' },
+                    { id: 'homework', name: 'домашка', topic: 'Обсуждение домашних заданий' },
+                    { id: 'projects', name: 'проекты', topic: 'Курсовые и проекты' },
+                    { id: 'exams', name: 'экзамены', topic: 'Подготовка к экзаменам' }
+                ],
+                members: [
+                    { name: 'Иван Петров', username: 'ivan_p', phone: '+7 (999) 123-45-67', bio: 'Староста группы, учусь на программиста', photos: ['1', '2'], status: 'online', role: 'староста', avatar: '1' },
+                    { name: 'Алексей Смирнов', username: 'alex_s', phone: '+7 (999) 234-56-78', bio: 'Люблю играть в CS2 и программировать', photos: ['3'], status: 'online', role: '', avatar: '2' },
+                    { name: 'Дмитрий Козлов', username: 'dima_k', phone: '+7 (999) 345-67-89', bio: 'Занимаюсь веб-разработкой', photos: ['4'], status: 'idle', role: '', avatar: '3' },
+                    { name: 'Сергей Морозов', username: 'serg_m', phone: '+7 (999) 456-78-90', bio: 'Люблю футбол и музыку', photos: ['5'], status: 'offline', role: '', avatar: '4' },
+                    { name: 'Павел Волков', username: 'pavel_v', phone: '+7 (999) 567-89-01', bio: 'Backend разработчик', photos: ['6'], status: 'online', role: '', avatar: '5' },
+                    { name: 'Артем Соколов', username: 'artem_s', phone: '+7 (999) 678-90-12', bio: 'Люблю играть в игры', photos: ['7'], status: 'online', role: '', avatar: '6' },
+                    { name: 'Максим Орлов', username: 'max_o', phone: '+7 (999) 789-01-23', bio: 'Учусь на дизайнера', photos: ['8'], status: 'idle', role: '', avatar: '7' },
+                    { name: 'Андрей Федоров', username: 'andrey_f', phone: '+7 (999) 890-12-34', bio: 'Люблю читать книги', photos: ['9'], status: 'offline', role: '', avatar: '8' },
+                    { name: 'Никита Соболев', username: 'nikita_s', phone: '+7 (999) 901-23-45', bio: 'Занимаюсь спортом', photos: ['10'], status: 'online', role: '', avatar: '9' },
+                    { name: 'Егор Титов', username: 'egor_t', phone: '+7 (999) 012-34-56', bio: 'Люблю путешествовать', photos: ['11'], status: 'online', role: '', avatar: '10' },
+                    { name: 'Мария Сидорова', username: 'masha_s', phone: '+7 (999) 123-45-68', bio: 'Люблю читать и рисовать', photos: ['12'], status: 'online', role: '', avatar: '11' },
+                    { name: 'Анна Иванова', username: 'anna_i', phone: '+7 (999) 234-56-79', bio: 'Дизайнер интерфейсов', photos: ['13'], status: 'online', role: '', avatar: '12' },
+                    { name: 'Елена Попова', username: 'lena_p', phone: '+7 (999) 345-67-80', bio: 'Люблю музыку и танцы', photos: ['14'], status: 'idle', role: '', avatar: '13' },
+                    { name: 'Ольга Смирнова', username: 'olga_s', phone: '+7 (999) 456-78-91', bio: 'Занимаюсь йогой', photos: ['15'], status: 'online', role: '', avatar: '14' },
+                    { name: 'Татьяна Морозова', username: 'tanya_m', phone: '+7 (999) 567-89-02', bio: 'Люблю готовить', photos: ['16'], status: 'offline', role: '', avatar: '15' },
+                    { name: 'Наталья Волкова', username: 'nata_v', phone: '+7 (999) 678-90-13', bio: 'Фотограф', photos: ['17'], status: 'online', role: '', avatar: '16' },
+                    { name: 'Юлия Соколова', username: 'yulia_s', phone: '+7 (999) 789-01-24', bio: 'Люблю котиков', photos: ['18'], status: 'online', role: '', avatar: '17' },
+                    { name: 'Анастасия Орлова', username: 'nastya_o', phone: '+7 (999) 890-12-35', bio: 'Изучаю Python', photos: ['19'], status: 'idle', role: '', avatar: '18' },
+                    { name: 'Учебный Бот', username: 'study_bot', phone: '🤖 Бот', bio: 'Я помогаю с учебой. Спрашивайте!', photos: [], status: 'online', role: 'бот', avatar: '19', isBot: true },
+                    { name: 'Расписание Бот', username: 'schedule_bot', phone: '🤖 Бот', bio: 'Актуальное расписание пар', photos: [], status: 'online', role: 'бот', avatar: '20', isBot: true }
+                ],
+                messages: {
+                    'general': [
+                        { id: 1, author: 'Иван Петров', time: '09:30', text: 'Всем привет! Пары сегодня в 10:00', avatar: '1', reactions: { '👍': 5 } },
+                        { id: 2, author: 'Мария Сидорова', time: '09:32', text: 'Принято, уже иду', avatar: '11', reactions: { '👍': 3 } },
+                        { id: 3, author: 'Алексей Смирнов', time: '09:35', text: 'А в какой аудитории?', avatar: '2', reactions: {} },
+                        { id: 4, author: 'Иван Петров', time: '09:36', text: '315, как обычно', avatar: '1', reactions: { '👍': 2 } },
+                        { id: 5, author: 'Анна Иванова', time: '09:40', text: 'Опять опаздываю😅', avatar: '12', reactions: { '❤️': 4 } },
+                        { id: 6, author: 'Учебный Бот', time: '09:45', text: 'Напоминаю: сегодня лабораторная работа по программированию!', avatar: '19', reactions: {} }
+                    ],
+                    'homework': [
+                        { id: 7, author: 'Мария Сидорова', time: 'вчера', text: 'Домашку по математике кто-то сделал?', avatar: '11', reactions: { '👍': 3 } },
+                        { id: 8, author: 'Анна Иванова', time: 'вчера', text: 'Я сделала, могу скинуть', avatar: '12', reactions: { '❤️': 2 } },
+                        { id: 9, author: 'Дмитрий Козлов', time: 'вчера', text: 'Скинь пожалуйста в личку', avatar: '3', reactions: {} },
+                        { id: 10, author: 'Учебный Бот', time: 'вчера', text: 'Домашнее задание есть в файлах группы', avatar: '19', reactions: { '👍': 2 } }
+                    ],
+                    'projects': [
+                        { id: 11, author: 'Иван Петров', time: '15.02', text: 'Кто как продвигается по курсовой?', avatar: '1', reactions: { '👍': 4 } },
+                        { id: 12, author: 'Алексей Смирнов', time: '15.02', text: 'Я почти закончил первую главу', avatar: '2', reactions: { '👍': 2, '❤️': 1 } },
+                        { id: 13, author: 'Елена Попова', time: '15.02', text: 'А у меня проблемы с бэкендом', avatar: '13', reactions: {} },
+                        { id: 14, author: 'Павел Волков', time: '15.02', text: 'Могу помочь, пиши', avatar: '5', reactions: { '👍': 3 } }
+                    ]
+                }
+            },
+            'news': {
+                name: 'Новости Москва',
+                meta: 'городской портал • 15K чел',
+                type: 'server',
+                channels: [
+                    { id: 'general', name: 'главное', topic: 'Главные новости Москвы' },
+                    { id: 'incidents', name: 'происшествия', topic: 'ДТП, ЧП, события' },
+                    { id: 'transport', name: 'транспорт', topic: 'Метро, автобусы, пробки' },
+                    { id: 'culture', name: 'культура', topic: 'Афиша, выставки, концерты' }
+                ],
+                members: [
+                    { name: 'Мэр Москвы', username: 'mayor_moscow', phone: 'Официально', bio: 'Официальный аккаунт мэра Москвы', photos: [], status: 'offline', role: 'админ', avatar: '21' },
+                    { name: 'Новости24', username: 'news24', phone: '🤖 Бот', bio: 'Самые свежие новости 24/7', photos: [], status: 'online', role: 'бот', avatar: '22', isBot: true },
+                    { name: 'Погодный Бот', username: 'weather_bot', phone: '🤖 Бот', bio: 'Прогноз погоды в Москве', photos: [], status: 'online', role: 'бот', avatar: '23', isBot: true },
+                    { name: 'Дептранс', username: 'transport_dep', phone: 'Официально', bio: 'Департамент транспорта Москвы', photos: [], status: 'idle', role: 'официальный', avatar: '24' },
+                    { name: 'Анна Королева', username: 'anna_k', phone: '+7 (495) 123-45-67', bio: 'Журналист, веду новостную ленту', photos: [], status: 'online', role: '', avatar: '25' },
+                    { name: 'Павел Волков', username: 'pavel_v', phone: '+7 (495) 234-56-78', bio: 'Фотокорреспондент', photos: [], status: 'online', role: '', avatar: '26' }
+                ],
+                messages: {
+                    'general': [
+                        { id: 101, author: 'Новости24', time: '10:15', text: '🔴 Срочно: В центре Москвы перекрыто движение из-за мероприятия', avatar: '22', reactions: { '👍': 12 } },
+                        { id: 102, author: 'Анна Королева', time: '10:17', text: 'А где именно?', avatar: '25', reactions: {} },
+                        { id: 103, author: 'Новости24', time: '10:18', text: 'От Кремля до Садового кольца', avatar: '22', reactions: { '👍': 5 } },
+                        { id: 104, author: 'Погодный Бот', time: '10:20', text: '🌧️ Сегодня в Москве +5°C, небольшой дождь', avatar: '23', reactions: {} }
+                    ]
+                }
+            },
+            'cs2': {
+                name: 'CS2 RU',
+                meta: 'игровое сообщество • 25K чел',
+                type: 'server',
+                channels: [
+                    { id: 'general', name: 'общий', topic: 'Обсуждение CS2' },
+                    { id: 'lfg', name: 'поиск-тимы', topic: 'Ищем тиммейтов' },
+                    { id: 'tactics', name: 'тактики', topic: 'Стратегии и гайды' },
+                    { id: 'clips', name: 'клипы', topic: 'Лучшие моменты' }
+                ],
+                members: [
+                    { name: 'CS2_Rus', username: 'cs2_news', phone: '🤖 Бот', bio: 'Новости CS2 на русском', photos: [], status: 'online', role: 'бот', avatar: '27', isBot: true },
+                    { name: 's1mple', username: 's1mple_pro', phone: 'Про игрок', bio: 'Профессиональный игрок в CS2', photos: [], status: 'offline', role: 'про', avatar: '28' },
+                    { name: 'm0NESY', username: 'm0nesy_pro', phone: 'Про игрок', bio: 'Снайпер команды G2', photos: [], status: 'online', role: 'про', avatar: '29' },
+                    { name: 'G2_Support', username: 'g2_support', phone: 'Клан', bio: 'Поддержка клана G2', photos: [], status: 'online', role: 'модер', avatar: '30' },
+                    { name: 'NoobMaster', username: 'noob_master', phone: '+7 (999) 111-22-33', bio: 'Люблю играть по вечерам', photos: [], status: 'idle', role: '', avatar: '31' },
+                    { name: 'ProPlayer', username: 'pro_player', phone: '+7 (999) 222-33-44', bio: 'Ищу команду для турниров', photos: [], status: 'online', role: '', avatar: '32' }
+                ],
+                messages: {
+                    'general': [
+                        { id: 201, author: 'CS2_Rus', time: '11:20', text: '🎮 Новый патч вышел, пофиксили баги с инвентарем', avatar: '27', reactions: { '👍': 23, '❤️': 5 } },
+                        { id: 202, author: 'NoobMaster', time: '11:22', text: 'А Mirage починили?', avatar: '31', reactions: { '👍': 3 } },
+                        { id: 203, author: 'CS2_Rus', time: '11:23', text: 'Да, текстуры поправили', avatar: '27', reactions: {} },
+                        { id: 204, author: 'G2_Support', time: '11:25', text: 'Ищем двоих для турнира, нужен 2k+ elo', avatar: '30', reactions: { '👍': 7 } }
+                    ]
+                }
+            },
+            'dota2': {
+                name: 'Dota 2 RU',
+                meta: 'Dota 2 сообщество • 32K чел',
+                type: 'server',
+                channels: [
+                    { id: 'general', name: 'общий', topic: 'Обсуждение Dota 2' },
+                    { id: 'mm', name: 'поиск-игр', topic: 'Ищем сокомандников' },
+                    { id: 'guides', name: 'гайды', topic: 'Гайды по героям' },
+                    { id: 'patches', name: 'патчи', topic: 'Обсуждение обновлений' }
+                ],
+                members: [
+                    { name: 'DotaBuff', username: 'dotabuff', phone: '🤖 Бот', bio: 'Статистика и новости Dota 2', photos: [], status: 'online', role: 'бот', avatar: '33', isBot: true },
+                    { name: 'Yatoro', username: 'yatoro_pro', phone: 'Про игрок', bio: 'Профессиональный игрок в Dota 2', photos: [], status: 'online', role: 'про', avatar: '34' },
+                    { name: 'Collapse', username: 'collapse_pro', phone: 'Про игрок', bio: 'Игрок Team Spirit', photos: [], status: 'offline', role: 'про', avatar: '35' },
+                    { name: 'KunkkaMain', username: 'kunkka_fan', phone: '+7 (999) 333-44-55', bio: 'Лучший герой - Kunkka', photos: [], status: 'online', role: '', avatar: '36' },
+                    { name: 'SupportGod', username: 'support_god', phone: '+7 (999) 444-55-66', bio: 'Играю только на саппортах', photos: [], status: 'idle', role: '', avatar: '37' }
+                ],
+                messages: {
+                    'general': [
+                        { id: 301, author: 'DotaBuff', time: '12:00', text: '📊 Новая мета: Керри-веник снова топ', avatar: '33', reactions: { '👍': 15, '❤️': 3 } },
+                        { id: 302, author: 'Yatoro', time: '12:05', text: 'Согласен, сейчас имба', avatar: '34', reactions: { '👍': 8 } },
+                        { id: 303, author: 'KunkkaMain', time: '12:10', text: 'Нужен саппорт на 5к+ ммр', avatar: '36', reactions: {} }
+                    ]
+                }
+            }
         };
 
-        let messages = [];
+        // ==================== ЛИЧНЫЕ СООБЩЕНИЯ ====================
+        const directMessages = {};
 
-        // Toggle info panel
-        function toggleInfoPanel() {
-            const panel = document.getElementById('infoPanel');
-            panel.classList.toggle('collapsed');
+        // Инициализация личных сообщений
+        function initDirectMessages() {
+            const allUsers = [];
+            for (let serverId in servers) {
+                if (serverId !== 'dms') {
+                    servers[serverId].members.forEach(m => {
+                        if (m.name !== 'Иван Петров' && !allUsers.find(u => u.name === m.name)) {
+                            allUsers.push(m);
+                            
+                            const messages = [];
+                            const count = Math.floor(Math.random() * 3) + 1;
+                            for (let i = 0; i < count; i++) {
+                                const hours = Math.floor(Math.random() * 12) + 10;
+                                const minutes = Math.floor(Math.random() * 60);
+                                const time = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+                                
+                                messages.push({
+                                    id: 10000 + Math.floor(Math.random() * 10000),
+                                    author: i % 2 === 0 ? m.name : 'Вы',
+                                    time: time,
+                                    text: i % 2 === 0 ? 
+                                        ['Привет! Как дела?', 'Ты видел новости?', 'Как успехи?', 'Заходи в гости'][Math.floor(Math.random() * 4)] :
+                                        ['Все отлично!', 'Да, интересно', 'Нормально', 'Скоро буду'][Math.floor(Math.random() * 4)]
+                                });
+                            }
+                            
+                            directMessages[m.name] = {
+                                id: m.name,
+                                author: m.name,
+                                messages: messages
+                            };
+                        }
+                    });
+                }
+            }
         }
 
-        // Отправка сообщения
+        initDirectMessages();
+
+        // ==================== КАРТА АВАТАРОК ====================
+        function getAvatarUrl(id) {
+            const avatarMap = {
+                // Мужчины
+                '1': 'https://randomuser.me/api/portraits/men/1.jpg',
+                '2': 'https://randomuser.me/api/portraits/men/2.jpg',
+                '3': 'https://randomuser.me/api/portraits/men/3.jpg',
+                '4': 'https://randomuser.me/api/portraits/men/4.jpg',
+                '5': 'https://randomuser.me/api/portraits/men/5.jpg',
+                '6': 'https://randomuser.me/api/portraits/men/6.jpg',
+                '7': 'https://randomuser.me/api/portraits/men/7.jpg',
+                '8': 'https://randomuser.me/api/portraits/men/8.jpg',
+                '9': 'https://randomuser.me/api/portraits/men/9.jpg',
+                '10': 'https://randomuser.me/api/portraits/men/10.jpg',
+                '28': 'https://randomuser.me/api/portraits/men/11.jpg',
+                '29': 'https://randomuser.me/api/portraits/men/12.jpg',
+                '30': 'https://randomuser.me/api/portraits/men/13.jpg',
+                '31': 'https://randomuser.me/api/portraits/men/14.jpg',
+                '32': 'https://randomuser.me/api/portraits/men/15.jpg',
+                '34': 'https://randomuser.me/api/portraits/men/16.jpg',
+                '35': 'https://randomuser.me/api/portraits/men/17.jpg',
+                '36': 'https://randomuser.me/api/portraits/men/18.jpg',
+                '37': 'https://randomuser.me/api/portraits/men/19.jpg',
+                
+                // Женщины
+                '11': 'https://randomuser.me/api/portraits/women/1.jpg',
+                '12': 'https://randomuser.me/api/portraits/women/2.jpg',
+                '13': 'https://randomuser.me/api/portraits/women/3.jpg',
+                '14': 'https://randomuser.me/api/portraits/women/4.jpg',
+                '15': 'https://randomuser.me/api/portraits/women/5.jpg',
+                '16': 'https://randomuser.me/api/portraits/women/6.jpg',
+                '17': 'https://randomuser.me/api/portraits/women/7.jpg',
+                '18': 'https://randomuser.me/api/portraits/women/8.jpg',
+                '25': 'https://randomuser.me/api/portraits/women/9.jpg',
+                '26': 'https://randomuser.me/api/portraits/women/10.jpg',
+                
+                // Боты
+                '19': 'https://cdn-icons-png.flaticon.com/128/4712/4712109.png',
+                '20': 'https://cdn-icons-png.flaticon.com/128/4712/4712035.png',
+                '22': 'https://cdn-icons-png.flaticon.com/128/724/724664.png',
+                '23': 'https://cdn-icons-png.flaticon.com/128/4814/4814268.png',
+                '27': 'https://cdn-icons-png.flaticon.com/128/3670/3670223.png',
+                '33': 'https://cdn-icons-png.flaticon.com/128/2593/2593646.png',
+                
+                // Специальные
+                '21': 'https://cdn-icons-png.flaticon.com/128/3135/3135715.png',
+                '24': 'https://cdn-icons-png.flaticon.com/128/3063/3063155.png'
+            };
+            
+            return avatarMap[id] || 'https://randomuser.me/api/portraits/men/1.jpg';
+        }
+
+        // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
+        let currentUser = {
+            name: 'Иван Петров',
+            username: 'ivan_petrov',
+            phone: '+7 (999) 123-45-67',
+            bio: 'Староста группы 21ИС-24. Увлекаюсь программированием и играми.',
+            status: 'online',
+            role: 'староста',
+            avatar: '1',
+            photos: ['1', '2']
+        };
+
+        let currentServer = '21is';
+        let currentChannel = 'general';
+        let currentDM = null;
+        let selectedMessageId = null;
+        let infoPanelVisible = true;
+        let messageIdCounter = 20000;
+        let botIntervals = [];
+        let selectedProfileUser = null;
+
+        // ==================== ТЕМЫ ====================
+        function setTheme(theme) {
+            const root = document.documentElement;
+            
+            switch(theme) {
+                case 'default':
+                    root.style.setProperty('--bg-primary', '#1a1e2a');
+                    root.style.setProperty('--bg-secondary', '#1f2533');
+                    root.style.setProperty('--bg-tertiary', '#252b3b');
+                    root.style.setProperty('--bg-hover', '#2b3348');
+                    root.style.setProperty('--accent-primary', '#7c4dff');
+                    root.style.setProperty('--accent-hover', '#946aff');
+                    root.style.setProperty('--text-primary', '#ffffff');
+                    root.style.setProperty('--text-secondary', '#e0e6ff');
+                    root.style.setProperty('--text-muted', '#8e9ac0');
+                    root.style.setProperty('--border-color', '#2d3548');
+                    root.style.setProperty('--server-bg', '#2f364a');
+                    root.style.setProperty('--message-hover', '#2b3348');
+                    root.style.setProperty('--toast-bg', '#2b3348');
+                    break;
+                case 'dark':
+                    root.style.setProperty('--bg-primary', '#000000');
+                    root.style.setProperty('--bg-secondary', '#0a0a0a');
+                    root.style.setProperty('--bg-tertiary', '#141414');
+                    root.style.setProperty('--bg-hover', '#1a1a1a');
+                    root.style.setProperty('--accent-primary', '#333333');
+                    root.style.setProperty('--accent-hover', '#4a4a4a');
+                    root.style.setProperty('--text-primary', '#ffffff');
+                    root.style.setProperty('--text-secondary', '#cccccc');
+                    root.style.setProperty('--text-muted', '#888888');
+                    root.style.setProperty('--border-color', '#333333');
+                    root.style.setProperty('--server-bg', '#1a1a1a');
+                    root.style.setProperty('--message-hover', '#1a1a1a');
+                    root.style.setProperty('--toast-bg', '#222222');
+                    break;
+                case 'light':
+                    root.style.setProperty('--bg-primary', '#f0f2f5');
+                    root.style.setProperty('--bg-secondary', '#ffffff');
+                    root.style.setProperty('--bg-tertiary', '#f5f5f5');
+                    root.style.setProperty('--bg-hover', '#e4e6eb');
+                    root.style.setProperty('--accent-primary', '#007bff');
+                    root.style.setProperty('--accent-hover', '#0056b3');
+                    root.style.setProperty('--text-primary', '#000000');
+                    root.style.setProperty('--text-secondary', '#333333');
+                    root.style.setProperty('--text-muted', '#666666');
+                    root.style.setProperty('--border-color', '#dddddd');
+                    root.style.setProperty('--server-bg', '#e4e6eb');
+                    root.style.setProperty('--message-hover', '#e4e6eb');
+                    root.style.setProperty('--toast-bg', '#ffffff');
+                    break;
+                case 'monochrome':
+                    root.style.setProperty('--bg-primary', '#1a1a1a');
+                    root.style.setProperty('--bg-secondary', '#2a2a2a');
+                    root.style.setProperty('--bg-tertiary', '#3a3a3a');
+                    root.style.setProperty('--bg-hover', '#4a4a4a');
+                    root.style.setProperty('--accent-primary', '#808080');
+                    root.style.setProperty('--accent-hover', '#999999');
+                    root.style.setProperty('--text-primary', '#ffffff');
+                    root.style.setProperty('--text-secondary', '#cccccc');
+                    root.style.setProperty('--text-muted', '#999999');
+                    root.style.setProperty('--border-color', '#4a4a4a');
+                    root.style.setProperty('--server-bg', '#3a3a3a');
+                    root.style.setProperty('--message-hover', '#4a4a4a');
+                    root.style.setProperty('--toast-bg', '#3a3a3a');
+                    break;
+                case 'blue':
+                    root.style.setProperty('--bg-primary', '#0a1929');
+                    root.style.setProperty('--bg-secondary', '#132f4c');
+                    root.style.setProperty('--bg-tertiary', '#1a3f5c');
+                    root.style.setProperty('--bg-hover', '#1f4b6e');
+                    root.style.setProperty('--accent-primary', '#1976d2');
+                    root.style.setProperty('--accent-hover', '#1565c0');
+                    root.style.setProperty('--text-primary', '#ffffff');
+                    root.style.setProperty('--text-secondary', '#e0f2fe');
+                    root.style.setProperty('--text-muted', '#90caf9');
+                    root.style.setProperty('--border-color', '#1e4b6e');
+                    root.style.setProperty('--server-bg', '#132f4c');
+                    root.style.setProperty('--message-hover', '#1f4b6e');
+                    root.style.setProperty('--toast-bg', '#132f4c');
+                    break;
+            }
+            
+            showToast('Тема изменена');
+            closeModal('settingsModal');
+        }
+
+        // ==================== БОТЫ ====================
+        function startBotConversations() {
+            botIntervals.forEach(interval => clearInterval(interval));
+            botIntervals = [];
+            
+            botIntervals.push(setInterval(() => {
+                if (currentServer === '21is' && currentChannel === 'general') {
+                    const bot = servers['21is'].members.find(m => m.isBot);
+                    if (bot) {
+                        const messages = [
+                            'Кто пойдет на пару?',
+                            'Домашнее задание уже сделали?',
+                            'Завтра контрольная, готовьтесь!',
+                            'Преподаватель просил принести тетради'
+                        ];
+                        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                        addBotMessage('21is', 'general', bot.name, randomMsg, bot.avatar);
+                    }
+                }
+            }, 25000));
+
+            botIntervals.push(setInterval(() => {
+                if (currentServer === 'news' && currentChannel === 'general') {
+                    const bot = servers['news'].members.find(m => m.isBot);
+                    if (bot) {
+                        const messages = [
+                            '🌧️ Сегодня в Москве +5°C, небольшой дождь',
+                            '🚇 На зеленой ветке задержки движения',
+                            '🏛️ В центре открылась новая выставка',
+                            '⚡ Новые тарифы на ЖКХ с апреля'
+                        ];
+                        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                        addBotMessage('news', 'general', bot.name, randomMsg, bot.avatar);
+                    }
+                }
+            }, 20000));
+
+            botIntervals.push(setInterval(() => {
+                if (currentServer === 'cs2' && currentChannel === 'general') {
+                    const bot = servers['cs2'].members.find(m => m.isBot);
+                    if (bot) {
+                        const messages = [
+                            '🎮 Новый скин для AK-47 вышел!',
+                            '🏆 Команда NAVI выиграла турнир',
+                            '📊 Обновили рейтинговую систему',
+                            '⚙️ Балансный патч на следующей неделе'
+                        ];
+                        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                        addBotMessage('cs2', 'general', bot.name, randomMsg, bot.avatar);
+                    }
+                }
+            }, 23000));
+
+            botIntervals.push(setInterval(() => {
+                if (currentServer === 'dota2' && currentChannel === 'general') {
+                    const bot = servers['dota2'].members.find(m => m.isBot);
+                    if (bot) {
+                        const messages = [
+                            '🎮 Новый герой выпущен!',
+                            '🏆 Team Spirit выиграла The International!',
+                            '📊 Обновили баланс героев',
+                            '🎁 Новый сет для Pudge в сокровищнице'
+                        ];
+                        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                        addBotMessage('dota2', 'general', bot.name, randomMsg, bot.avatar);
+                    }
+                }
+            }, 27000));
+        }
+
+        function addBotMessage(serverId, channelId, botName, text, avatar) {
+            if (!servers[serverId].messages[channelId]) {
+                servers[serverId].messages[channelId] = [];
+            }
+            
+            const newMsg = {
+                id: messageIdCounter++,
+                author: botName,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                text: text,
+                avatar: avatar,
+                reactions: {}
+            };
+            
+            servers[serverId].messages[channelId].push(newMsg);
+            
+            if (currentServer === serverId && currentChannel === channelId) {
+                renderMessages();
+            } else {
+                const badge = document.getElementById(`badge-${channelId}`);
+                if (badge) {
+                    badge.classList.add('active');
+                    badge.textContent = '1';
+                }
+            }
+        }
+
+        // ==================== АВАТАРЫ И ФОТО ====================
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatarPreview = document.getElementById('avatarPreview');
+                    const currentUserAvatar = document.getElementById('currentUserAvatar');
+                    
+                    avatarPreview.style.backgroundImage = `url('${e.target.result}')`;
+                    avatarPreview.innerHTML = '';
+                    currentUserAvatar.style.backgroundImage = `url('${e.target.result}')`;
+                    currentUserAvatar.innerHTML = '';
+                    
+                    currentUser.avatar = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handlePhotosUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length > 0) {
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        currentUser.photos.push(e.target.result);
+                        renderUserPhotos();
+                    };
+                    reader.readAsDataURL(file);
+                });
+                showToast('Фото добавлены');
+            }
+        }
+
+        function renderUserPhotos() {
+            const area = document.getElementById('userPhotosArea');
+            if (!area) return;
+            
+            area.innerHTML = '';
+            currentUser.photos.forEach((photo, index) => {
+                area.innerHTML += `
+                    <div class="photo-upload-item" style="background-image: url('${getAvatarUrl(photo)}');" onclick="removeUserPhoto(${index})"></div>
+                `;
+            });
+            
+            const remaining = 4 - currentUser.photos.length;
+            for (let i = 0; i < remaining; i++) {
+                area.innerHTML += `
+                    <div class="photo-upload-item" onclick="document.getElementById('photoUpload').click()">➕</div>
+                `;
+            }
+        }
+
+        function removeUserPhoto(index) {
+            currentUser.photos.splice(index, 1);
+            renderUserPhotos();
+            showToast('Фото удалено');
+        }
+
+        // ==================== ПРОФИЛИ ====================
+        function showUserProfile(username) {
+            let user = null;
+            
+            if (username === currentUser.name) {
+                user = currentUser;
+            } else {
+                for (let serverId in servers) {
+                    const found = servers[serverId].members.find(m => m.name === username);
+                    if (found) {
+                        user = found;
+                        break;
+                    }
+                }
+            }
+            
+            if (user) {
+                selectedProfileUser = user;
+                
+                document.getElementById('profileModalTitle').textContent = `Профиль ${user.name}`;
+                
+                const avatarEl = document.getElementById('profileAvatar');
+                if (user.avatar) {
+                    avatarEl.style.backgroundImage = `url('${getAvatarUrl(user.avatar)}')`;
+                    avatarEl.innerHTML = '';
+                } else {
+                    avatarEl.style.backgroundImage = '';
+                    avatarEl.innerHTML = user.name[0];
+                }
+                
+                document.getElementById('profileName').textContent = user.name;
+                document.getElementById('profileUsername').textContent = `@${user.username || user.name.toLowerCase().replace(' ', '_')}`;
+                document.getElementById('profilePhone').textContent = user.phone || '📞 Не указан';
+                document.getElementById('profileBio').textContent = user.bio || 'Пользователь не заполнил информацию';
+                
+                const photosEl = document.getElementById('profilePhotos');
+                photosEl.innerHTML = '';
+                if (user.photos && user.photos.length > 0) {
+                    user.photos.forEach(photo => {
+                        photosEl.innerHTML += `<div class="profile-photo" style="background-image: url('${getAvatarUrl(photo)}');" onclick="openImage('${getAvatarUrl(photo)}')"></div>`;
+                    });
+                } else {
+                    photosEl.innerHTML = '<p style="color: var(--text-muted); grid-column: span 3;">Нет фотографий</p>';
+                }
+                
+                const dmBtn = document.getElementById('startDMBtn');
+                if (user.name === currentUser.name) {
+                    dmBtn.style.display = 'none';
+                } else {
+                    dmBtn.style.display = 'block';
+                }
+                
+                openModal('userProfileModal');
+            } else {
+                showToast('Пользователь не найден');
+            }
+        }
+
+        function startDMFromProfile() {
+            if (selectedProfileUser) {
+                closeModal('userProfileModal');
+                
+                const dmServerIcon = document.querySelector('[data-server="dms"]');
+                switchServer('dms', dmServerIcon);
+                
+                setTimeout(() => {
+                    const dmItem = document.querySelector(`[data-dm="${selectedProfileUser.name}"]`);
+                    if (dmItem) {
+                        openDM(selectedProfileUser.name, dmItem);
+                    }
+                }, 100);
+            }
+        }
+
+        // ==================== РЕАКЦИИ ====================
+        function addReaction(messageId, reaction) {
+            if (currentServer === 'dms' && currentDM) {
+                const msg = directMessages[currentDM].messages.find(m => m.id === messageId);
+                if (msg) {
+                    if (!msg.reactions) msg.reactions = {};
+                    msg.reactions[reaction] = (msg.reactions[reaction] || 0) + 1;
+                    renderMessages();
+                    showToast(`Добавлена реакция ${reaction}`);
+                }
+            } else {
+                const server = servers[currentServer];
+                const chatKey = currentChannel;
+                const msg = server.messages[chatKey].find(m => m.id === messageId);
+                
+                if (msg) {
+                    if (!msg.reactions) msg.reactions = {};
+                    msg.reactions[reaction] = (msg.reactions[reaction] || 0) + 1;
+                    renderMessages();
+                    showToast(`Добавлена реакция ${reaction}`);
+                }
+            }
+        }
+
+        function addReactionFromMenu(reaction) {
+            if (selectedMessageId) {
+                addReaction(selectedMessageId, reaction);
+            }
+            closeContextMenu();
+        }
+
+        // ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
+        function renderServer() {
+            const server = servers[currentServer];
+            document.getElementById('workspaceName').textContent = server.name;
+            document.getElementById('workspaceMeta').textContent = server.meta;
+
+            if (currentServer === 'dms') {
+                document.getElementById('channelsList').innerHTML = '';
+                
+                const dmList = document.getElementById('dmList');
+                dmList.innerHTML = '';
+                
+                const allUsers = [];
+                for (let serverId in servers) {
+                    if (serverId !== 'dms') {
+                        servers[serverId].members.forEach(m => {
+                            if (m.name !== currentUser.name && !allUsers.find(u => u.name === m.name)) {
+                                allUsers.push(m);
+                            }
+                        });
+                    }
+                }
+                
+                allUsers.sort((a, b) => a.name.localeCompare(b.name));
+                
+                allUsers.forEach(user => {
+                    const avatarUrl = getAvatarUrl(user.avatar);
+                    const avatarStyle = `background-image: url('${avatarUrl}');`;
+                    const dmData = directMessages[user.name] || { messages: [] };
+                    const unread = dmData.messages.filter(m => m.author !== 'Вы').length;
+                    
+                    dmList.innerHTML += `
+                        <div class="channel-item" data-dm="${user.name}" onclick="openDM('${user.name}', this)">
+                            <div class="member-avatar-wrapper">
+                                <div class="member-avatar-small" style="${avatarStyle} background-size: cover;"></div>
+                                <span class="member-status ${user.status}"></span>
+                            </div>
+                            <div class="member-info">
+                                <span class="member-name">${user.name}</span>
+                                ${user.role ? `<span class="member-role">${user.role}</span>` : ''}
+                            </div>
+                            ${unread > 0 ? `<span class="channel-badge active">${unread}</span>` : ''}
+                        </div>
+                    `;
+                });
+            } else {
+                const channelsList = document.getElementById('channelsList');
+                channelsList.innerHTML = '';
+                server.channels.forEach(ch => {
+                    channelsList.innerHTML += `
+                        <div class="channel-item ${ch.id === currentChannel ? 'active' : ''}" data-channel="${ch.id}" onclick="switchChannel('${ch.id}', this)">
+                            <span class="hash">#</span>
+                            <span>${ch.name}</span>
+                            <span class="channel-badge" id="badge-${ch.id}"></span>
+                        </div>
+                    `;
+                });
+
+                const dmList = document.getElementById('dmList');
+                dmList.innerHTML = '';
+                server.members.forEach(member => {
+                    if (member.name !== currentUser.name) {
+                        const avatarUrl = getAvatarUrl(member.avatar);
+                        const avatarStyle = `background-image: url('${avatarUrl}');`;
+                        dmList.innerHTML += `
+                            <div class="channel-item" data-dm="${member.name}" onclick="openDM('${member.name}', this)">
+                                <div class="member-avatar-wrapper">
+                                    <div class="member-avatar-small" style="${avatarStyle} background-size: cover;"></div>
+                                    <span class="member-status ${member.status}"></span>
+                                </div>
+                                <div class="member-info">
+                                    <span class="member-name">${member.name}</span>
+                                    ${member.role ? `<span class="member-role">${member.role}</span>` : ''}
+                                </div>
+                                <span class="channel-badge" id="badge-${member.name}"></span>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            updateMembersList();
+            renderMessages();
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesArea');
+            
+            if (currentServer === 'dms' && currentDM) {
+                const dmData = directMessages[currentDM] || { messages: [] };
+                document.getElementById('currentChannel').textContent = `✉️ ${currentDM}`;
+                document.getElementById('currentTopic').textContent = 'Личный разговор';
+                document.getElementById('infoTopic').textContent = 'Личный разговор';
+                
+                if (!dmData.messages || dmData.messages.length === 0) {
+                    container.innerHTML = '<div class="empty-state" style="color: var(--text-muted); text-align: center; padding: 50px;">Напишите первое сообщение</div>';
+                    return;
+                }
+                
+                let html = '<div class="date-divider"><span class="date-text">Сегодня</span></div>';
+                
+                dmData.messages.forEach(msg => {
+                    const isOwn = msg.author === 'Вы';
+                    
+                    let avatar = null;
+                    for (let serverId in servers) {
+                        const user = servers[serverId].members.find(m => m.name === msg.author);
+                        if (user) {
+                            avatar = getAvatarUrl(user.avatar);
+                            break;
+                        }
+                    }
+                    
+                    if (msg.author === 'Вы') {
+                        avatar = getAvatarUrl(currentUser.avatar);
+                    }
+                    
+                    const avatarStyle = avatar ? `background-image: url('${avatar}');` : '';
+                    
+                    let reactionsHtml = '';
+                    if (msg.reactions && Object.keys(msg.reactions).length > 0) {
+                        reactionsHtml = '<div class="message-reactions">';
+                        for (let [reaction, count] of Object.entries(msg.reactions)) {
+                            reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${reaction}')">${reaction} <span class="count">${count}</span></span>`;
+                        }
+                        reactionsHtml += '</div>';
+                    }
+                    
+                    html += `
+                        <div class="message" id="msg-${msg.id}" data-id="${msg.id}" data-author="${msg.author}">
+                            <div class="message-avatar-wrapper" onclick="showUserProfile('${msg.author === 'Вы' ? currentUser.name : msg.author}')">
+                                <div class="message-avatar" style="${avatarStyle} background-size: cover;"></div>
+                                <span class="status-badge online"></span>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-author" onclick="showUserProfile('${msg.author === 'Вы' ? currentUser.name : msg.author}')">${msg.author}</span>
+                                    <span class="message-time">${msg.time}</span>
+                                </div>
+                                <div class="message-text">${escapeHtml(msg.text)}</div>
+                                ${reactionsHtml}
+                                <div class="message-footer">
+                                    <button onclick="replyToMessage(${msg.id})">💬 Ответить</button>
+                                    <button onclick="addReaction(${msg.id}, '👍')">👍</button>
+                                    <button onclick="addReaction(${msg.id}, '❤️')">❤️</button>
+                                    <button onclick="showMessageMenu(event, ${msg.id})">⋯</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } else {
+                const server = servers[currentServer];
+                if (!server || !server.messages) {
+                    container.innerHTML = '<div class="empty-state" style="color: var(--text-muted); text-align: center; padding: 50px;">Нет сообщений</div>';
+                    return;
+                }
+                
+                const messages = server.messages[currentChannel] || [];
+                const channel = server.channels.find(c => c.id === currentChannel);
+                
+                document.getElementById('currentChannel').textContent = `# ${channel?.name || 'чат'}`;
+                document.getElementById('currentTopic').textContent = channel?.topic || '';
+                document.getElementById('infoTopic').textContent = channel?.topic || '';
+
+                if (messages.length === 0) {
+                    container.innerHTML = '<div class="empty-state" style="color: var(--text-muted); text-align: center; padding: 50px;">Нет сообщений</div>';
+                    return;
+                }
+
+                let html = '<div class="date-divider"><span class="date-text">Сегодня</span></div>';
+                
+                messages.forEach(msg => {
+                    const member = server.members.find(m => m.name === msg.author);
+                    const avatarUrl = getAvatarUrl(msg.avatar || member?.avatar);
+                    const avatarStyle = `background-image: url('${avatarUrl}');`;
+                    const status = member?.status || 'offline';
+                    
+                    let reactionsHtml = '';
+                    if (msg.reactions && Object.keys(msg.reactions).length > 0) {
+                        reactionsHtml = '<div class="message-reactions">';
+                        for (let [reaction, count] of Object.entries(msg.reactions)) {
+                            reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${reaction}')">${reaction} <span class="count">${count}</span></span>`;
+                        }
+                        reactionsHtml += '</div>';
+                    }
+                    
+                    html += `
+                        <div class="message" id="msg-${msg.id}" data-id="${msg.id}" data-author="${msg.author}">
+                            <div class="message-avatar-wrapper" onclick="showUserProfile('${msg.author}')">
+                                <div class="message-avatar" style="${avatarStyle} background-size: cover;"></div>
+                                <span class="status-badge ${status}"></span>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-author" onclick="showUserProfile('${msg.author}')">${msg.author}</span>
+                                    <span class="message-time">${msg.time}</span>
+                                    ${member?.role ? `<span class="role-badge">${member.role}</span>` : ''}
+                                </div>
+                                <div class="message-text">${escapeHtml(msg.text)}</div>
+                                ${reactionsHtml}
+                                <div class="message-footer">
+                                    <button onclick="replyToMessage(${msg.id})">💬 Ответить</button>
+                                    <button onclick="addReaction(${msg.id}, '👍')">👍</button>
+                                    <button onclick="addReaction(${msg.id}, '❤️')">❤️</button>
+                                    <button onclick="showMessageMenu(event, ${msg.id})">⋯</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
+            
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateMembersList() {
+            const server = servers[currentServer];
+            if (!server || currentServer === 'dms') {
+                document.getElementById('membersList').innerHTML = '<div class="member-item">Выберите сервер</div>';
+                document.getElementById('onlineCount').textContent = '0';
+                document.getElementById('totalMembers').textContent = '0';
+                document.getElementById('memberCount').textContent = '0';
+                return;
+            }
+            
+            const membersList = document.getElementById('membersList');
+            
+            membersList.innerHTML = server.members.map(m => {
+                const avatarUrl = getAvatarUrl(m.avatar);
+                const avatarStyle = `background-image: url('${avatarUrl}');`;
+                
+                return `
+                    <div class="member-item" onclick="showUserProfile('${m.name}')">
+                        <div class="member-avatar-wrapper">
+                            <div class="member-avatar-small" style="${avatarStyle} background-size: cover;"></div>
+                            <span class="member-status ${m.status}"></span>
+                        </div>
+                        <div class="member-info">
+                            <span class="member-name">${m.name}</span>
+                            ${m.role ? `<span class="member-role">${m.role}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const onlineCount = server.members.filter(m => m.status !== 'offline').length;
+            document.getElementById('onlineCount').textContent = onlineCount;
+            document.getElementById('onlineUsers').textContent = onlineCount;
+            document.getElementById('totalMembers').textContent = server.members.length;
+            document.getElementById('memberCount').textContent = server.members.length;
+        }
+
+        // ==================== ОБРАБОТЧИКИ ====================
+        function switchServer(serverId, element) {
+            document.querySelectorAll('.server-icon').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            
+            currentServer = serverId;
+            currentChannel = serverId === 'dms' ? null : 'general';
+            currentDM = null;
+            
+            renderServer();
+            showToast(`Переключен на ${servers[serverId].name}`);
+        }
+
+        function switchChannel(channelId, element) {
+            document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            
+            currentChannel = channelId;
+            currentDM = null;
+            
+            const badge = document.getElementById(`badge-${channelId}`);
+            if (badge) {
+                badge.classList.remove('active');
+                badge.textContent = '';
+            }
+            
+            renderMessages();
+        }
+
+        function openDM(userName, element) {
+            document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            
+            currentDM = userName;
+            currentChannel = null;
+            
+            if (currentServer !== 'dms') {
+                const dmServerIcon = document.querySelector('[data-server="dms"]');
+                switchServer('dms', dmServerIcon);
+            } else {
+                renderMessages();
+            }
+            
+            const badge = document.getElementById(`badge-${userName}`);
+            if (badge) {
+                badge.classList.remove('active');
+                badge.textContent = '';
+            }
+        }
+
         function sendMessage() {
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
             
-            if (text) {
-                // Создаем новое сообщение
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message';
-                messageDiv.innerHTML = `
-                    <div class="message-avatar">И</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">${currentUser.name}</span>
-                            <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                        </div>
-                        <div class="message-text">
-                            ${escapeHtml(text)}
-                        </div>
-                        <div class="message-footer">
-                            <button>💬 Ответить</button>
-                            <button>👍</button>
-                            <button>❤️</button>
-                            <button>⋯</button>
-                        </div>
-                    </div>
-                `;
+            if (!text) return;
+
+            if (currentServer === 'dms' && currentDM) {
+                if (!directMessages[currentDM]) {
+                    directMessages[currentDM] = {
+                        id: currentDM,
+                        author: currentDM,
+                        messages: []
+                    };
+                }
                 
-                document.getElementById('messagesArea').appendChild(messageDiv);
+                const newMsg = {
+                    id: messageIdCounter++,
+                    author: 'Вы',
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    text: text,
+                    reactions: {}
+                };
+                
+                directMessages[currentDM].messages.push(newMsg);
+                renderMessages();
                 input.value = '';
                 
-                // Скролл вниз
-                const messagesArea = document.getElementById('messagesArea');
-                messagesArea.scrollTop = messagesArea.scrollHeight;
+                showToast('Сообщение отправлено');
+            } else {
+                const server = servers[currentServer];
+                let chatKey = currentChannel;
+                
+                if (!server.messages[chatKey]) {
+                    server.messages[chatKey] = [];
+                }
+
+                const newMsg = {
+                    id: messageIdCounter++,
+                    author: currentUser.name,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    text: text,
+                    avatar: currentUser.avatar,
+                    reactions: {}
+                };
+
+                server.messages[chatKey].push(newMsg);
+                renderMessages();
+                input.value = '';
+                
+                showToast('Сообщение отправлено');
             }
         }
 
-        // Экранирование HTML
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+        function replyToMessage(messageId) {
+            let msg;
+            if (currentServer === 'dms' && currentDM) {
+                msg = directMessages[currentDM].messages.find(m => m.id === messageId);
+            } else {
+                const server = servers[currentServer];
+                const chatKey = currentChannel;
+                msg = server.messages[chatKey].find(m => m.id === messageId);
+            }
+            
+            if (msg) {
+                document.getElementById('messageInput').value = `>> ${msg.author}: ${msg.text}\n`;
+                document.getElementById('messageInput').focus();
+                showToast('Ответ на сообщение');
+            }
+            closeContextMenu();
         }
 
-        // Enter отправляет сообщение
-        document.getElementById('messageInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+        function showMessageMenu(event, messageId) {
+            event.preventDefault();
+            event.stopPropagation();
+            selectedMessageId = messageId;
+            
+            const msgElement = document.getElementById(`msg-${messageId}`);
+            const author = msgElement?.dataset.author;
+            const isOwn = author === 'Вы' || author === currentUser.name;
+            
+            const editItem = document.getElementById('editMenuItem');
+            const deleteForAllItem = document.getElementById('deleteForAllMenuItem');
+            
+            if (isOwn) {
+                editItem.style.display = 'flex';
+                deleteForAllItem.style.display = 'flex';
+            } else {
+                editItem.style.display = 'none';
+                deleteForAllItem.style.display = 'none';
             }
-        });
-
-        // Авто-расширение textarea
-        document.getElementById('messageInput').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
-
-        // Контекстное меню
-        function showMessageMenu(event) {
+            
             const menu = document.getElementById('contextMenu');
             menu.style.display = 'block';
             menu.style.left = event.pageX + 'px';
@@ -1144,10 +2442,9 @@
             }, 10);
         }
 
-        // Закрытие контекстного меню при клике вне его
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', function(event) {
             const menu = document.getElementById('contextMenu');
-            if (!menu.contains(e.target)) {
+            if (!menu.contains(event.target)) {
                 menu.classList.remove('show');
                 setTimeout(() => {
                     menu.style.display = 'none';
@@ -1155,51 +2452,135 @@
             }
         });
 
-        // Drag & Drop для файлов
-        const dropArea = document.querySelector('.file-drop-area');
-        if (dropArea) {
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
+        function copyMessage() {
+            let msg;
+            if (currentServer === 'dms' && currentDM) {
+                msg = directMessages[currentDM].messages.find(m => m.id === selectedMessageId);
+            } else {
+                const server = servers[currentServer];
+                const chatKey = currentChannel;
+                msg = server.messages[chatKey].find(m => m.id === selectedMessageId);
             }
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropArea.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, unhighlight, false);
-            });
-
-            function highlight() {
-                dropArea.classList.add('dragover');
+            
+            if (msg) {
+                navigator.clipboard.writeText(msg.text);
+                showToast('Текст скопирован');
             }
-
-            function unhighlight() {
-                dropArea.classList.remove('dragover');
-            }
-
-            dropArea.addEventListener('drop', handleDrop, false);
-
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            }
+            closeContextMenu();
         }
 
-        // Обработка файлов
-        function handleFiles(files) {
-            console.log('Файлы получены:', files);
-            // Здесь логика загрузки файлов
+        function deleteForAll() {
+            if (currentServer === 'dms' && currentDM) {
+                const index = directMessages[currentDM].messages.findIndex(m => m.id === selectedMessageId);
+                const msg = directMessages[currentDM].messages[index];
+                
+                if (msg && msg.author === 'Вы') {
+                    directMessages[currentDM].messages.splice(index, 1);
+                    renderMessages();
+                    showToast('Сообщение удалено для всех');
+                } else {
+                    showToast('Нельзя удалить чужое сообщение');
+                }
+            } else {
+                const server = servers[currentServer];
+                const chatKey = currentChannel;
+                const index = server.messages[chatKey].findIndex(m => m.id === selectedMessageId);
+                const msg = server.messages[chatKey][index];
+                
+                if (msg && msg.author === currentUser.name) {
+                    server.messages[chatKey].splice(index, 1);
+                    renderMessages();
+                    showToast('Сообщение удалено для всех');
+                } else {
+                    showToast('Нельзя удалить чужое сообщение');
+                }
+            }
+            closeContextMenu();
         }
 
-        // Модальные окна
+        function deleteForMe() {
+            const msgElement = document.getElementById(`msg-${selectedMessageId}`);
+            if (msgElement) {
+                msgElement.style.display = 'none';
+                showToast('Сообщение удалено для себя');
+            }
+            closeContextMenu();
+        }
+
+        function editMessage() {
+            let msg;
+            if (currentServer === 'dms' && currentDM) {
+                msg = directMessages[currentDM].messages.find(m => m.id === selectedMessageId);
+            } else {
+                const server = servers[currentServer];
+                const chatKey = currentChannel;
+                msg = server.messages[chatKey].find(m => m.id === selectedMessageId);
+            }
+            
+            if (msg && (msg.author === 'Вы' || msg.author === currentUser.name)) {
+                const newText = prompt('Редактировать:', msg.text);
+                if (newText) {
+                    msg.text = newText;
+                    renderMessages();
+                    showToast('Сообщение отредактировано');
+                }
+            } else {
+                showToast('Можно редактировать только свои сообщения');
+            }
+            closeContextMenu();
+        }
+
+        function closeContextMenu() {
+            const menu = document.getElementById('contextMenu');
+            menu.classList.remove('show');
+            setTimeout(() => {
+                menu.style.display = 'none';
+            }, 200);
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('usernameInput').value;
+            const newUsername = document.getElementById('userUsernameInput').value;
+            const newPhone = document.getElementById('userPhoneInput').value;
+            const newBio = document.getElementById('userBioInput').value;
+            const newStatus = document.getElementById('statusSelect').value;
+            
+            currentUser.name = newName;
+            currentUser.username = newUsername;
+            currentUser.phone = newPhone;
+            currentUser.bio = newBio;
+            currentUser.status = newStatus;
+            
+            document.getElementById('currentUserName').textContent = newName;
+            
+            const statusElement = document.getElementById('currentUserStatus');
+            statusElement.className = `current-user-status ${newStatus}`;
+            
+            closeModal('profileModal');
+            renderMessages();
+            showToast('Профиль обновлен');
+        }
+
         function openModal(modalId) {
+            if (modalId === 'profileModal') {
+                document.getElementById('usernameInput').value = currentUser.name;
+                document.getElementById('userUsernameInput').value = currentUser.username;
+                document.getElementById('userPhoneInput').value = currentUser.phone;
+                document.getElementById('userBioInput').value = currentUser.bio;
+                document.getElementById('statusSelect').value = currentUser.status;
+                
+                const avatarPreview = document.getElementById('avatarPreview');
+                if (currentUser.avatar) {
+                    avatarPreview.style.backgroundImage = `url('${getAvatarUrl(currentUser.avatar)}')`;
+                    avatarPreview.innerHTML = '';
+                } else {
+                    avatarPreview.style.backgroundImage = '';
+                    avatarPreview.innerHTML = currentUser.name[0];
+                }
+                
+                renderUserPhotos();
+            }
+            
             document.getElementById(modalId).classList.add('show');
         }
 
@@ -1207,25 +2588,86 @@
             document.getElementById(modalId).classList.remove('show');
         }
 
-        // Ответ на сообщение
-        function replyToMessage(messageId) {
-            const message = document.getElementById(messageId);
-            if (message) {
-                const author = message.querySelector('.message-author').textContent;
-                const text = message.querySelector('.message-text').textContent;
-                
-                document.getElementById('messageInput').value = `>> ${author}: ${text}\n`;
-                document.getElementById('messageInput').focus();
+        function attachFile() {
+            openModal('fileUploadModal');
+        }
+
+        function selectFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                showToast(`Файл ${file.name} загружен`);
+                closeModal('fileUploadModal');
             }
         }
 
-        // Добавление реакции
-        function addReaction(reaction) {
-            console.log('Добавлена реакция:', reaction);
-            // Здесь логика добавления реакций
+        function handleDragOver(event) {
+            event.preventDefault();
+            document.getElementById('fileDropArea').classList.add('dragover');
         }
 
-        // Открытие изображения на весь экран
+        function handleDragLeave() {
+            document.getElementById('fileDropArea').classList.remove('dragover');
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            document.getElementById('fileDropArea').classList.remove('dragover');
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                showToast(`Файл ${file.name} загружен`);
+                closeModal('fileUploadModal');
+            }
+        }
+
+        function toggleInfoPanel() {
+            const panel = document.getElementById('infoPanel');
+            infoPanelVisible = !infoPanelVisible;
+            panel.classList.toggle('collapsed');
+        }
+
+        function toggleNotifications() {
+            showToast('Уведомления переключены');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function showConnectionInfo() {
+            showToast('Сервер: localhost:3000');
+        }
+
+        function openPinned() {
+            showToast('Закрепленные сообщения');
+        }
+
+        function openMembers() {
+            toggleInfoPanel();
+        }
+
+        function mentionUser() {
+            document.getElementById('messageInput').value += '@';
+        }
+
+        function insertEmoji() {
+            const emojis = ['😊', '👍', '❤️', '🎉', '🔥'];
+            document.getElementById('messageInput').value += emojis[Math.floor(Math.random() * emojis.length)];
+        }
+
         function openImage(src) {
             const modal = document.createElement('div');
             modal.style.cssText = `
@@ -1239,6 +2681,7 @@
                 align-items: center;
                 justify-content: center;
                 z-index: 3000;
+                cursor: pointer;
             `;
             
             const img = document.createElement('img');
@@ -1252,85 +2695,15 @@
             document.body.appendChild(modal);
         }
 
-        // Горячие клавиши
-        document.addEventListener('keydown', (e) => {
-            // Ctrl+K - поиск
-            if (e.ctrlKey && e.key === 'k') {
-                e.preventDefault();
-                document.querySelector('.search-box').focus();
-            }
+        // Запуск
+        window.onload = function() {
+            renderServer();
+            startBotConversations();
             
-            // Ctrl+N - новый канал
-            if (e.ctrlKey && e.key === 'n') {
-                e.preventDefault();
-                openModal('createChannelModal');
-            }
-            
-            // Ctrl+, - настройки
-            if (e.ctrlKey && e.key === ',') {
-                e.preventDefault();
-                console.log('Открыть настройки');
-            }
-            
-            // Esc - закрыть модальные окна
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal.show').forEach(modal => {
-                    modal.classList.remove('show');
-                });
-            }
-        });
-
-        // Симуляция входящих сообщений для демонстрации
-        function simulateIncomingMessage() {
-            const messages = [
-                { author: 'Мария Сидорова', text: 'Коллеги, когда созвон по проекту?' },
-                { author: 'Алексей Смирнов', text: 'Я загрузил новую версию документации' },
-                { author: 'Дмитрий Козлов', text: 'Предлагаю собраться в 16:00' },
-                { author: 'Анна Иванова', text: 'У кого есть вопросы по лабораторной?' }
-            ];
-            
-            const random = messages[Math.floor(Math.random() * messages.length)];
-            
-            setTimeout(() => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message';
-                messageDiv.innerHTML = `
-                    <div class="message-avatar">${random.author[0]}</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">${random.author}</span>
-                            <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                        </div>
-                        <div class="message-text">
-                            ${random.text}
-                        </div>
-                        <div class="message-footer">
-                            <button>💬 Ответить</button>
-                            <button>👍</button>
-                            <button>❤️</button>
-                            <button>⋯</button>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('messagesArea').appendChild(messageDiv);
-                
-                // Уведомление в заголовке
-                if (document.hidden) {
-                    document.title = '🔔 Новое сообщение';
-                }
-            }, 5000 + Math.random() * 5000);
-        }
-
-        // Запуск симуляции
-        setInterval(simulateIncomingMessage, 10000);
-
-        // Восстановление заголовка при фокусе
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                document.title = 'QuickChat Desktop Pro';
-            }
-        });
+            setInterval(() => {
+                document.getElementById('ping').textContent = Math.floor(Math.random() * 50) + 100;
+            }, 3000);
+        };
     </script>
 </body>
 </html>
