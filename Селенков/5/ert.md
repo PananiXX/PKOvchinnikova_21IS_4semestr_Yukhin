@@ -1,735 +1,535 @@
-## Разбор кода построчно:
+Ниже код с нумерацией функций и подробными пояснениями по каждой строке. Источники пометил в конце ответа. [habr](https://habr.com/ru/companies/bft/articles/777348/)
+
+***
+
+## Код с номерами функций
 
 ```python
 import psycopg2
-```
-- **import** - команда чтобы подключить готовый код
-- **psycopg2** - библиотека для работы с PostgreSQL
+from datetime import date
 
-```python
-from datetime import datetime
-```
-- **from** - взять из
-- **datetime** - библиотека для работы с датами
-- **import datetime** - взять только функцию datetime
+DB_CONFIG = {
+    'host': 'localhost',
+    'database': '21is5',
+    'user': 'postgres',
+    'password': '1111',
+    'port': '5432'
+}
 
----
+def connect():  # Функция 0
+    return psycopg2.connect(**DB_CONFIG)
 
-```python
-def connect_db():
-```
-- **def** - создать функцию
-- **connect_db** - название функции
-
-```python
-    try:
-```
-- **try** - попробовать выполнить код
-
-```python
-        conn = psycopg2.connect(
-```
-- **conn** - переменная для подключения
-- **psycopg2.connect()** - функция подключения к БД
-
-```python
-            database="workout_db",
-```
-- **database** - имя базы данных
-- **"workout_db"** - название БД
-
-```python
-            user="postgres",
-```
-- **user** - имя пользователя
-- **"postgres"** - стандартный пользователь
-
-```python
-            password="1111",
-```
-- **password** - пароль
-- **"1111"** - сам пароль
-
-```python
-            host="localhost"
-```
-- **host** - где находится БД
-- **"localhost"** - на этом же компьютере
-
-```python
-        )
-        print("Подключение успешно")
-```
-- **print()** - вывести текст на экран
-
-```python
-        return conn
-```
-- **return** - вернуть результат
-- **conn** - само подключение
-
-```python
-    except:
-```
-- **except** - если в try была ошибка
-
-```python
-        print("Ошибка подключения")
-        return None
-```
-- **None** - ничего (пустота)
-
----
-
-```python
-def add_workout(conn):
-```
-- **add_workout** - добавить тренировку
-- **(conn)** - функция принимает подключение
-
-```python
-    print("\n--- Добавление тренировки ---")
-```
-- **\n** - новая строка
-
-```python
-    name = input("Упражнение: ")
-```
-- **name** - переменная для названия
-- **input()** - спросить у пользователя
-
-```python
-    date = input("Дата (ГГГГ-ММ-ДД), Enter если сегодня: ")
-    if date == "":
-```
-- **if** - если
-- **date == ""** - если строка пустая (нажали Enter)
-
-```python
-        now = datetime.now()
-```
-- **now** - текущий момент
-- **datetime.now()** - получить текущую дату и время
-
-```python
-        date = f"{now.year}-{now.month}-{now.day}"
-```
-- **f"..."** - форматированная строка
-- **now.year** - текущий год
-- **now.month** - месяц
-- **now.day** - день
-
-```python
-    try:
-        sets = int(input("Подходы: "))
-```
-- **int()** - превратить в целое число
-
-```python
-        reps = int(input("Повторения: "))
-        weight = float(input("Вес: "))
-```
-- **float()** - превратить в дробное число
-
-```python
-    except:
-        print("Ошибка! Нужны цифры!")
-        return
-```
-- **return** без значения - выйти из функции
-
-```python
-    diff = input("Сложность (легко/нормально/тяжело): ")
-    notes = input("Заметки: ")
-```
-
-```python
+def add_workout(ex, d, sets, reps, w, diff, notes):  # Функция 1
+    conn = connect()
     cur = conn.cursor()
-```
-- **cur** - курсор (штука для запросов)
-- **cursor()** - создать курсор
-
-```python
-    cur.execute("INSERT INTO training_logs VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", 
-                (name, date, sets, reps, weight, diff, notes))
-```
-- **execute()** - выполнить SQL запрос
-- **INSERT INTO** - добавить в таблицу
-- **training_logs** - название таблицы
-- **VALUES** - значения
-- **%s** - места для подстановки
-- **(..., ...)** - кортеж с данными
-
-```python
-    conn.commit()
-```
-- **commit()** - сохранить изменения
-
-```python
-    cur.close()
-```
-- **close()** - закрыть курсор
-
-```python
-    print("Добавлено!")
-```
-
----
-
-```python
-def get_all_workouts(conn):
-    print("\n--- Все тренировки ---")
-    
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM training_logs")
-```
-- **SELECT * FROM** - взять всё из таблицы
-
-```python
-    rows = cur.fetchall()
-```
-- **fetchall()** - получить все строки
-
-```python
-    if len(rows) == 0:
-```
-- **len()** - длина (количество)
-
-```python
-        print("Нет записей!")
-        cur.close()
-        return
-    
-    for r in rows:
-```
-- **for** - цикл
-- **r** - одна запись
-- **in rows** - в списке rows
-
-```python
-        print(f"{r[2]} | {r[1]} | {r[3]}x{r[4]} | {r[5]}кг")
-```
-- **r[2]** - третий элемент (индексы с 0)
-- **|** - просто разделитель
-
-```python
-    cur.close()
-```
-
----
-
-```python
-def search_by_exercise(conn):
-    print("\n--- Поиск ---")
-    
-    name = input("Название: ")
-    
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM training_logs WHERE exercise_name = %s", (name,))
-```
-- **WHERE** - условие
-- **exercise_name = %s** - название равно
-
-```python
-    rows = cur.fetchall()
-    
-    if len(rows) == 0:
-        print("Ничего нет")
-    else:
-        for r in rows:
-            print(f"{r[2]} | {r[1]} | {r[3]}x{r[4]} | {r[5]}кг")
-    cur.close()
-```
-
----
-
-```python
-def filter_by_date(conn):
-    print("\n--- Фильтр по дате ---")
-    
-    start = input("От: ")
-    end = input("До: ")
-    
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM training_logs WHERE training_date >= %s AND training_date <= %s", (start, end))
-```
-- **>=** - больше или равно
-- **<=** - меньше или равно
-- **AND** - и (оба условия)
-
-```python
-    rows = cur.fetchall()
-    
-    if len(rows) == 0:
-        print("Записей нет")
-    else:
-        for r in rows:
-            print(f"{r[2]} | {r[1]} | {r[3]}x{r[4]} | {r[5]}кг")
-    cur.close()
-```
-
----
-
-```python
-def update_workout(conn):
-    print("\n--- Обновление ---")
-    
-    id = input("ID: ")
-    weight = input("Новый вес: ")
-    reps = input("Новые повторения: ")
-    
-    cur = conn.cursor()
-    cur.execute("UPDATE training_logs SET weight_kg = %s, reps = %s WHERE id = %s", (weight, reps, id))
-```
-- **UPDATE** - обновить
-- **SET** - установить
-- **weight_kg = %s** - поле вес = 
-- **WHERE id = %s** - где айди =
-
-```python
+    cur.execute(
+        """INSERT INTO training_logs
+           (exercise_name, training_date, sets, reps,
+            weight_kg, difficulty, notes)
+           VALUES (%s,%s,%s,%s,%s,%s,%s)
+           RETURNING id""",
+        (ex, d, sets, reps, w, diff, notes)
+    )
+    wid = cur.fetchone()[0]
     conn.commit()
     cur.close()
-    print("Обновлено!")
-```
+    conn.close()
+    print("Добавлено, ID =", wid)
 
----
-
-```python
-def delete_workout(conn):
-    print("\n--- Удаление ---")
-    
-    id = input("ID: ")
-    
+def show_all():  # Функция 2
+    conn = connect()
     cur = conn.cursor()
-    cur.execute("DELETE FROM training_logs WHERE id = %s", (id,))
-```
-- **DELETE FROM** - удалить из
+    cur.execute(
+        "SELECT id, exercise_name, training_date, sets, reps, "
+        "weight_kg, difficulty, notes "
+        "FROM training_logs ORDER BY training_date DESC"
+    )
+    for r in cur.fetchall():
+        print(*r, sep=" | ")
+    cur.close()
+    conn.close()
 
-```python
+def search_ex(name):  # Функция 3
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT id, exercise_name, training_date, sets, reps,
+                  weight_kg, difficulty, notes
+           FROM training_logs
+           WHERE lower(exercise_name) LIKE lower(%s)
+           ORDER BY training_date DESC""",
+        (f"%{name}%",)
+    )
+    for r in cur.fetchall():
+        print(*r, sep=" | ")
+    cur.close()
+    conn.close()
+
+def filter_date(d1, d2):  # Функция 4
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT id, exercise_name, training_date, sets, reps,
+                  weight_kg, difficulty, notes
+           FROM training_logs
+           WHERE training_date BETWEEN %s AND %s
+           ORDER BY training_date""",
+        (d1, d2)
+    )
+    for r in cur.fetchall():
+        print(*r, sep=" | ")
+    cur.close()
+    conn.close()
+
+def update_workout(wid, w, notes):  # Функция 5
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE training_logs SET weight_kg=%s, notes=%s WHERE id=%s",
+        (w, notes, wid)
+    )
     conn.commit()
     cur.close()
-    print("Удалено!")
-```
+    conn.close()
+    print("Обновлено")
 
----
-
-```python
-def get_progress_stats(conn):
-    print("\n--- СТАТИСТИКА ---")
-    
+def delete_workout(wid):  # Функция 6
+    conn = connect()
     cur = conn.cursor()
-    
-    cur.execute("SELECT COUNT(*) FROM training_logs")
-```
-- **COUNT(*)** - посчитать количество строк
-
-```python
-    total = cur.fetchone()[0]
-```
-- **fetchone()** - получить одну строку
-- **[0]** - первый элемент
-
-```python
-    print(f"Всего записей: {total}")
-    
-    cur.execute("SELECT MAX(weight_kg) FROM training_logs")
-```
-- **MAX()** - максимальное значение
-
-```python
-    max_w = cur.fetchone()[0]
-    print(f"Макс вес: {max_w} кг")
-    
-    cur.execute("SELECT AVG(sets) FROM training_logs")
-```
-- **AVG()** - среднее значение
-
-```python
-    avg_s = cur.fetchone()[0]
-    print(f"Среднее подходов: {avg_s}")
-    
+    cur.execute("DELETE FROM training_logs WHERE id=%s", (wid,))
+    conn.commit()
     cur.close()
-```
+    conn.close()
+    print("Удалено")
 
----
+def stats():  # Функция 7
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT count(*), max(weight_kg),
+                  avg(weight_kg), avg(reps)
+           FROM training_logs"""
+    )
+    total, mx, avg_w, avg_r = cur.fetchone()
+    cur.close()
+    conn.close()
+    print("Всего записей:", total)
+    print("Макс. вес:", mx)
+    print("Средний вес:", round(avg_w or 0, 2))
+    print("Средние повторы:", round(avg_r or 0, 2))
 
-```python
-def menu():
-    conn = connect_db()
-    if conn == None:
-        return
-    
+def main():  # Функция 8
     while True:
-```
-- **while True:** - бесконечный цикл
+        print("\n1 Добавить"
+              "\n2 Показать все"
+              "\n3 Поиск по упражнению"
+              "\n4 Фильтр по дате"
+              "\n5 Обновить запись"
+              "\n6 Удалить запись"
+              "\n7 Статистика"
+              "\n0 Выход")
+        cmd = input("Выбор: ")
 
-```python
-        print("\nМЕНЮ:")
-        print("1 - Добавить")
-        print("2 - Показать все")
-        print("3 - Поиск")
-        print("4 - Фильтр по дате")
-        print("5 - Обновить")
-        print("6 - Удалить")
-        print("7 - Статистика")
-        print("0 - Выход")
-        
-        choice = input("Выбери: ")
-        
-        if choice == "1":
-            add_workout(conn)
-        elif choice == "2":
-            get_all_workouts(conn)
-        elif choice == "3":
-            search_by_exercise(conn)
-        elif choice == "4":
-            filter_by_date(conn)
-        elif choice == "5":
-            update_workout(conn)
-        elif choice == "6":
-            delete_workout(conn)
-        elif choice == "7":
-            get_progress_stats(conn)
-        elif choice == "0":
-            print("Пока!")
+        if cmd == "1":
+            ex = input("Упражнение: ")
+            d = input("Дата YYYY-MM-DD (Enter = сегодня): ") or str(date.today())
+            sets = int(input("Подходы: "))
+            reps = int(input("Повторы: "))
+            w = float(input("Вес: "))
+            diff = input("Сложность (легко/нормально/тяжело): ")
+            notes = input("Заметки: ")
+            add_workout(ex, d, sets, reps, w, diff, notes)
+
+        elif cmd == "2":
+            show_all()
+
+        elif cmd == "3":
+            search_ex(input("Название упражнения: "))
+
+        elif cmd == "4":
+            d1 = input("С даты YYYY-MM-DD: ")
+            d2 = input("По дату YYYY-MM-DD: ")
+            filter_date(d1, d2)
+
+        elif cmd == "5":
+            wid = int(input("ID: "))
+            w = float(input("Новый вес: "))
+            notes = input("Новые заметки: ")
+            update_workout(wid, w, notes)
+
+        elif cmd == "6":
+            delete_workout(int(input("ID: ")))
+
+        elif cmd == "7":
+            stats()
+
+        elif cmd == "0":
             break
+
+        else:
+            print("Нет такого пункта")
+
+if __name__ == "__main__":
+    main()
 ```
-- **break** - выйти из цикла
+
+***
+
+## Пояснение по строкам и словам
+
+### Импорт и конфиг
+
+- `import psycopg2` — подключаем библиотеку для работы с PostgreSQL из Python. [eax](https://eax.me/2019/2019-11-05-python-psycopg2.html)
+- `from datetime import date` — берём класс `date`, чтобы получать сегодняшнюю дату. [pythonlib](https://pythonlib.ru/library-theme53)
 
 ```python
-        else:
-            print("Неправильно!")
-    
+DB_CONFIG = {
+    'host': 'localhost',
+    'database': '21is5',
+    'user': 'postgres',
+    'password': '1111',
+    'port': '5432'
+}
+```
+
+- `DB_CONFIG` — словарь с настройками подключения.  
+- `'host': 'localhost'` — сервер базы данных, здесь тот же компьютер.  
+- `'database': '21is5'` — имя базы, которую ты создал.  
+- `'user': 'postgres'` — пользователь PostgreSQL.  
+- `'password': '1111'` — пароль пользователя.  
+- `'port': '5432'` — порт, на котором работает PostgreSQL (стандартный 5432). [wiki.postgresql](https://wiki.postgresql.org/wiki/Psycopg2_Tutorial)
+
+***
+
+### Функция 0: `connect`
+
+```python
+def connect():
+    return psycopg2.connect(**DB_CONFIG)
+```
+
+- `def connect():` — объявление функции без аргументов.  
+- `psycopg2.connect(...)` — создаёт соединение с базой. [eax](https://eax.me/2019/2019-11-05-python-psycopg2.html)
+- `**DB_CONFIG` — распаковывает словарь как named‑аргументы (`host=.., database=..`).  
+- `return` — возвращает объект соединения, чтобы другие функции могли его использовать.  
+
+***
+
+### Функция 1: `add_workout`
+
+```python
+def add_workout(ex, d, sets, reps, w, diff, notes):
+```
+
+- Аргументы: название упражнения, дата, подходы, повторы, вес, сложность, заметки — всё по ТЗ.
+
+```python
+    conn = connect()
+```
+
+- `conn` — объект соединения с базой, полученный из функции 0.
+
+```python
+    cur = conn.cursor()
+```
+
+- `cursor()` — создаёт курсор, через него выполняются SQL‑запросы. [psycopg](https://www.psycopg.org/docs/cursor.html)
+
+```python
+    cur.execute(
+        """INSERT INTO training_logs
+           (exercise_name, training_date, sets, reps,
+            weight_kg, difficulty, notes)
+           VALUES (%s,%s,%s,%s,%s,%s,%s)
+           RETURNING id""",
+        (ex, d, sets, reps, w, diff, notes)
+    )
+```
+
+- `cur.execute` — выполняет SQL‑команду.  
+- Тройные кавычки `"""..."""` — многострочная строка с запросом.  
+- `INSERT INTO training_logs (...) VALUES (...)` — вставка новой строки в таблицу.  
+- `%s` — параметр запроса (подставится безопасно через psycopg2, защита от SQL‑инъекций). [pythonlib](https://pythonlib.ru/library-theme53)
+- `RETURNING id` — после вставки вернуть значение поля `id`.  
+- Второй аргумент `(... )` — кортеж значений, которые подставятся на места `%s`.
+
+```python
+    wid = cur.fetchone()[0]
+```
+
+- `fetchone()` — берёт одну строку результата (там лежит только поле `id`).  
+- `[0]` — берём первый элемент строки — сам id.  
+
+```python
+    conn.commit()
+```
+
+- `commit()` — подтверждает изменения в базе, без него вставка не сохранится. [eax](https://eax.me/2019/2019-11-05-python-psycopg2.html)
+
+```python
+    cur.close()
     conn.close()
 ```
-- **close()** - закрыть подключение
+
+- Закрываем курсор и соединение, чтобы не держать лишние ресурсы. [geeksforgeeks](https://www.geeksforgeeks.org/python/how-to-close-connections-in-psycopg2-using-python/)
 
 ```python
-menu()
+    print("Добавлено, ID =", wid)
 ```
-- Запустить функцию menu
 
-Вот и всё! Каждая строчка что-то делает ☝️
+- Показываем пользователю номер созданной записи.  
 
-## ЧТО ТАКОЕ ФУНКЦИЯ?
+***
 
-**Функция** - это кусок кода, который можно вызвать по имени. Как рецепт: ты один раз записываешь рецепт (создаешь функцию), а потом можешь готовить по нему сколько хочешь (вызывать функцию).
+### Функция 2: `show_all`
 
-Пример из жизни:
-- Функция "сварить_кофе" - налил воду, насыпал кофе, включил кнопку
-- Когда хочешь кофе - говоришь "сварить_кофе()" и он готов
-
-В программе то же самое: написал код один раз, а вызываешь когда нужно.
-
----
-
-## ВСЕГО ФУНКЦИЙ В КОДЕ: 9 ШТУК
-
-### Функция №1: `connect_db()`
 ```python
-def connect_db():
-    try:
-        conn = psycopg2.connect(
-            database="workout_db",
-            user="postgres",
-            password="1111",
-            host="localhost"
-        )
-        print("Подключение успешно")
-        return conn
-    except:
-        print("Ошибка подключения")
-        return None
-```
-**Что делает:** Подключается к базе данных
-- `def` - создать функцию
-- `connect_db` - имя функции (соединиться с БД)
-- `()` - скобки (функция без входных данных)
-- `:` - начало функции
-- `try:` - попробуй выполнить
-- `conn = psycopg2.connect(...)` - переменная conn = подключение к БД
-- `database="workout_db"` - имя базы
-- `user="postgres"` - логин
-- `password="1111"` - пароль
-- `host="localhost"` - на этом компе
-- `print("Подключение успешно")` - вывести текст
-- `return conn` - вернуть подключение
-- `except:` - если ошибка
-- `print("Ошибка подключения")` - вывести ошибку
-- `return None` - вернуть пустоту
-
----
-
-### Функция №2: `add_workout(conn)`
-```python
-def add_workout(conn):
-    print("\n--- Добавление тренировки ---")
-    
-    name = input("Упражнение: ")
-    date = input("Дата (ГГГГ-ММ-ДД), Enter если сегодня: ")
-    if date == "":
-        now = datetime.now()
-        date = f"{now.year}-{now.month}-{now.day}"
-    
-    try:
-        sets = int(input("Подходы: "))
-        reps = int(input("Повторения: "))
-        weight = float(input("Вес: "))
-    except:
-        print("Ошибка! Нужны цифры!")
-        return
-    
-    diff = input("Сложность (легко/нормально/тяжело): ")
-    notes = input("Заметки: ")
-    
+def show_all():
+    conn = connect()
     cur = conn.cursor()
-    cur.execute("INSERT INTO training_logs (exercise_name, training_date, sets, reps, weight_kg, difficulty, notes) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
-                (name, date, sets, reps, weight, diff, notes))
-    conn.commit()
-    cur.close()
-    
-    print("Добавлено!")
 ```
-**Что делает:** Добавляет новую тренировку в базу
-- `def add_workout(conn):` - функция с входным параметром conn (подключение)
-- `print("\n--- Добавление тренировки ---")` - заголовок
-- `name = input("Упражнение: ")` - спросить и сохранить в name
-- `date = input("Дата... ")` - спросить дату
-- `if date == "":` - если ничего не ввели
-- `now = datetime.now()` - взять текущее время
-- `date = f"{now.year}-{now.month}-{now.day}"` - сделать строку с датой
-- `try:` - попробуй
-- `sets = int(input("Подходы: "))` - спросить и сделать числом
-- `reps = int(input("Повторения: "))` - повторения
-- `weight = float(input("Вес: "))` - вес
-- `except:` - если ошибка
-- `print("Ошибка! Нужны цифры!")` - вывести
-- `return` - выйти из функции
-- `diff = input("Сложность... ")` - сложность
-- `notes = input("Заметки: ")` - заметки
-- `cur = conn.cursor()` - создать курсор
-- `cur.execute("INSERT...", (данные))` - выполнить запрос на добавление
-- `conn.commit()` - сохранить
-- `cur.close()` - закрыть курсор
-- `print("Добавлено!")` - сообщить
 
----
+- Подключение и создание курсора.
 
-### Функция №3: `get_all_workouts(conn)`
 ```python
-def get_all_workouts(conn):
-    print("\n--- Все тренировки ---")
-    
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM training_logs")
-    rows = cur.fetchall()
-    
-    if len(rows) == 0:
-        print("Нет записей!")
-        cur.close()
-        return
-    
-    for r in rows:
-        print(f"{r[2]} | {r[1]} | {r[3]}x{r[4]} | {r[5]}кг")
-    cur.close()
+    cur.execute(
+        "SELECT id, exercise_name, training_date, sets, reps, "
+        "weight_kg, difficulty, notes "
+        "FROM training_logs ORDER BY training_date DESC"
+    )
 ```
-**Что делает:** Показывает все тренировки
-- `cur.execute("SELECT * FROM training_logs")` - взять всё из таблицы
-- `rows = cur.fetchall()` - сохранить все строки в rows
-- `if len(rows) == 0:` - если строк 0 (пусто)
-- `for r in rows:` - для каждой строки в rows
-- `print(f"{r[2]} | {r[1]} | {r[3]}x{r[4]} | {r[5]}кг")` - вывести дату, упражнение, подходыxповторы, вес
 
----
+- `SELECT ... FROM training_logs` — выбирает нужные столбцы.  
+- `ORDER BY training_date DESC` — сортировка по дате, последние тренировки сверху. [eax](https://eax.me/2019/2019-11-05-python-psycopg2.html)
 
-### Функция №4: `search_by_exercise(conn)`
 ```python
-def search_by_exercise(conn):
-    print("\n--- Поиск ---")
-    
-    name = input("Название: ")
-    
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM training_logs WHERE exercise_name = %s", (name,))
-    rows = cur.fetchall()
-    
-    if len(rows) == 0:
-        print("Ничего нет")
-    else:
-        for r in rows:
-            print(f"{r[2]} | {r[1]} | {r[3]}x{r[4]} | {r[5]}кг")
-    cur.close()
+    for r in cur.fetchall():
+        print(*r, sep=" | ")
 ```
-**Что делает:** Ищет тренировки по названию
-- `WHERE exercise_name = %s` - условие: название упражнения равно
-- `(name,)` - значение для подстановки
 
----
+- `fetchall()` — получить все строки результата.  
+- `for r in ...` — перебираем строки.  
+- `print(*r, sep=" | ")` — `*r` распаковывает элементы строки в аргументы print, `sep` задаёт разделитель.  
 
-### Функция №5: `filter_by_date(conn)`
 ```python
-def filter_by_date(conn):
-    print("\n--- Фильтр по дате ---")
-    
-    start = input("От: ")
-    end = input("До: ")
-    
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM training_logs WHERE training_date >= %s AND training_date <= %s", (start, end))
-    rows = cur.fetchall()
-    
-    if len(rows) == 0:
-        print("Записей нет")
-    else:
-        for r in rows:
-            print(f"{r[2]} | {r[1]} | {r[3]}x{r[4]} | {r[5]}кг")
     cur.close()
-```
-**Что делает:** Показывает тренировки за период
-- `WHERE training_date >= %s AND training_date <= %s` - дата больше или равна И дата меньше или равна
-
----
-
-### Функция №6: `update_workout(conn)`
-```python
-def update_workout(conn):
-    print("\n--- Обновление ---")
-    
-    id = input("ID: ")
-    weight = input("Новый вес: ")
-    reps = input("Новые повторения: ")
-    
-    cur = conn.cursor()
-    cur.execute("UPDATE training_logs SET weight_kg = %s, reps = %s WHERE id = %s", (weight, reps, id))
-    conn.commit()
-    cur.close()
-    print("Обновлено!")
-```
-**Что делает:** Обновляет вес и повторения
-- `UPDATE training_logs SET` - обновить таблицу, установить
-- `weight_kg = %s` - вес = 
-- `reps = %s` - повторения = 
-- `WHERE id = %s` - где айди =
-
----
-
-### Функция №7: `delete_workout(conn)`
-```python
-def delete_workout(conn):
-    print("\n--- Удаление ---")
-    
-    id = input("ID: ")
-    
-    cur = conn.cursor()
-    cur.execute("DELETE FROM training_logs WHERE id = %s", (id,))
-    conn.commit()
-    cur.close()
-    print("Удалено!")
-```
-**Что делает:** Удаляет тренировку
-- `DELETE FROM training_logs` - удалить из таблицы
-- `WHERE id = %s` - где айди =
-
----
-
-### Функция №8: `get_progress_stats(conn)`
-```python
-def get_progress_stats(conn):
-    print("\n--- СТАТИСТИКА ---")
-    
-    cur = conn.cursor()
-    
-    cur.execute("SELECT COUNT(*) FROM training_logs")
-    total = cur.fetchone()[0]
-    print(f"Всего записей: {total}")
-    
-    cur.execute("SELECT MAX(weight_kg) FROM training_logs")
-    max_w = cur.fetchone()[0]
-    print(f"Макс вес: {max_w} кг")
-    
-    cur.execute("SELECT AVG(sets) FROM training_logs")
-    avg_s = cur.fetchone()[0]
-    print(f"Среднее подходов: {avg_s}")
-    
-    cur.close()
-```
-**Что делает:** Показывает статистику
-- `SELECT COUNT(*)` - посчитать количество
-- `SELECT MAX(weight_kg)` - найти максимальный вес
-- `SELECT AVG(sets)` - найти среднее подходов
-- `cur.fetchone()[0]` - взять первый элемент из первой строки
-
----
-
-### Функция №9: `menu()`
-```python
-def menu():
-    conn = connect_db()
-    if conn == None:
-        return
-    
-    while True:
-        print("\nМЕНЮ:")
-        print("1 - Добавить")
-        print("2 - Показать все")
-        print("3 - Поиск")
-        print("4 - Фильтр по дате")
-        print("5 - Обновить")
-        print("6 - Удалить")
-        print("7 - Статистика")
-        print("0 - Выход")
-        
-        choice = input("Выбери: ")
-        
-        if choice == "1":
-            add_workout(conn)
-        elif choice == "2":
-            get_all_workouts(conn)
-        elif choice == "3":
-            search_by_exercise(conn)
-        elif choice == "4":
-            filter_by_date(conn)
-        elif choice == "5":
-            update_workout(conn)
-        elif choice == "6":
-            delete_workout(conn)
-        elif choice == "7":
-            get_progress_stats(conn)
-        elif choice == "0":
-            print("Пока!")
-            break
-        else:
-            print("Неправильно!")
-    
     conn.close()
 ```
-**Что делает:** Главное меню программы
-- `conn = connect_db()` - вызвать функцию №1 (подключиться)
-- `if conn == None:` - если не подключились
-- `return` - выйти
-- `while True:` - бесконечный цикл
-- `choice = input("Выбери: ")` - спросить цифру
-- `if choice == "1":` - если 1
-- `add_workout(conn)` - вызвать функцию №2
-- `elif choice == "2":` - если 2
-- `get_all_workouts(conn)` - вызвать функцию №3
-- и так далее для всех цифр
-- `elif choice == "0":` - если 0
-- `break` - выйти из цикла
-- `else:` - иначе (любая другая цифра)
-- `print("Неправильно!")` - ошибка
 
----
+- Закрытие ресурсов.  
 
-## ПОСЛЕДНЯЯ СТРОКА:
+***
+
+### Функция 3: `search_ex`
+
 ```python
-menu()
+def search_ex(name):
+    conn = connect()
+    cur = conn.cursor()
 ```
-- Вызвать функцию №9 - запустить программу
 
----
+- Подключение к базе.
 
-## ИТОГ:
-- **9 функций** в коде
-- Каждая делает свою конкретную задачу
-- Главная функция `menu()` вызывает остальные по выбору пользователя
+```python
+    cur.execute(
+        """SELECT id, exercise_name, training_date, sets, reps,
+                  weight_kg, difficulty, notes
+           FROM training_logs
+           WHERE lower(exercise_name) LIKE lower(%s)
+           ORDER BY training_date DESC""",
+        (f"%{name}%",)
+    )
+```
+
+- `WHERE lower(exercise_name) LIKE lower(%s)` — поиск по названию, без учёта регистра. [habr](https://habr.com/ru/companies/bft/articles/777348/)
+- `f"%{name}%"` — шаблон: содержит введённую строку (например `%жим%`).  
+- Запятая в конце `( ..., )` — делает кортеж из одного элемента.  
+
+Дальше цикл и закрытие — как в `show_all`.  
+
+***
+
+### Функция 4: `filter_date`
+
+```python
+def filter_date(d1, d2):
+    conn = connect()
+    cur = conn.cursor()
+```
+
+- Получает две даты: начало и конец.
+
+```python
+    cur.execute(
+        """SELECT id, exercise_name, training_date, sets, reps,
+                  weight_kg, difficulty, notes
+           FROM training_logs
+           WHERE training_date BETWEEN %s AND %s
+           ORDER BY training_date""",
+        (d1, d2)
+    )
+```
+
+- `BETWEEN %s AND %s` — выбирает записи в указанном диапазоне дат включительно. [eax](https://eax.me/2019/2019-11-05-python-psycopg2.html)
+
+Остальное — вывод и закрытие.  
+
+***
+
+### Функция 5: `update_workout`
+
+```python
+def update_workout(wid, w, notes):
+    conn = connect()
+    cur = conn.cursor()
+```
+
+- `wid` — id записи, `w` — новый вес, `notes` — новые заметки.
+
+```python
+    cur.execute(
+        "UPDATE training_logs SET weight_kg=%s, notes=%s WHERE id=%s",
+        (w, notes, wid)
+    )
+```
+
+- `UPDATE ... SET ... WHERE id=%s` — изменение строки по её id.  
+
+```python
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("Обновлено")
+```
+
+- Подтверждаем изменения, закрываем, выводим сообщение.  
+
+***
+
+### Функция 6: `delete_workout`
+
+```python
+def delete_workout(wid):
+    conn = connect()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM training_logs WHERE id=%s", (wid,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("Удалено")
+```
+
+- Удаление строки по id через `DELETE`.  
+- `(wid,)` — кортеж из одного значения.  
+- `commit()` — подтверждение удаления.  
+
+***
+
+### Функция 7: `stats`
+
+```python
+def stats():
+    conn = connect()
+    cur = conn.cursor()
+```
+
+- Подключение к базе.
+
+```python
+    cur.execute(
+        """SELECT count(*), max(weight_kg),
+                  avg(weight_kg), avg(reps)
+           FROM training_logs"""
+    )
+```
+
+- `count(*)` — количество записей.  
+- `max(weight_kg)` — максимальный вес.  
+- `avg(weight_kg)` — средний вес.  
+- `avg(reps)` — среднее число повторений. [eax](https://eax.me/2019/2019-11-05-python-psycopg2.html)
+
+```python
+    total, mx, avg_w, avg_r = cur.fetchone()
+```
+
+- Разбираем одну строку результата на четыре переменные.  
+
+```python
+    cur.close()
+    conn.close()
+```
+
+- Закрываем соединение.
+
+```python
+    print("Всего записей:", total)
+    print("Макс. вес:", mx)
+    print("Средний вес:", round(avg_w or 0, 2))
+    print("Средние повторы:", round(avg_r or 0, 2))
+```
+
+- `avg_w or 0` — если среднее `None` (нет строк), берём 0.  
+- `round(..., 2)` — округляем до двух знаков после запятой.  
+
+***
+
+### Функция 8: `main` (консольное меню)
+
+```python
+def main():
+    while True:
+```
+
+- Бесконечный цикл — меню показывается до выхода пользователя.
+
+```python
+        print("\n1 Добавить"
+              "\n2 Показать все"
+              "\n3 Поиск по упражнению"
+              "\n4 Фильтр по дате"
+              "\n5 Обновить запись"
+              "\n6 Удалить запись"
+              "\n7 Статистика"
+              "\n0 Выход")
+```
+
+- Текстовое меню; `\n` — перевод строки.
+
+```python
+        cmd = input("Выбор: ")
+```
+
+- `input` читает строку с клавиатуры, `cmd` — выбранный пункт.
+
+Блоки `if` / `elif`:
+
+- `"1"` — собираем данные тренировки, приводим числа через `int` и `float`, берём дату или сегодняшнюю через `str(date.today())`, затем вызываем функцию 1 `add_workout(...)`.  
+- `"2"` — вызов функции 2 `show_all()`.  
+- `"3"` — функция 3 `search_ex(...)`.  
+- `"4"` — функция 4 `filter_date(...)`.  
+- `"5"` — функция 5 `update_workout(...)`.  
+- `"6"` — функция 6 `delete_workout(...)`.  
+- `"7"` — функция 7 `stats()`.  
+- `"0"` — `break` выходит из цикла, программа заканчивается.  
+- `else` — если введён неверный пункт, выводим сообщение.  
+
+***
+
+### Запуск файла
+
+```python
+if __name__ == "__main__":
+    main()
+```
+
+- Проверка, что файл запущен напрямую, а не импортирован.  
+- В этом случае вызывается `main()`, и стартует меню. [pythonlib](https://pythonlib.ru/library-theme53)
+
+***
+
+## Откуда взята информация
+
+- Синтаксис psycopg2 (`connect`, `cursor`, `execute`, `fetchone`, `fetchall`, `commit`, `close`) и пример работы с PostgreSQL. [wiki.postgresql](https://wiki.postgresql.org/wiki/Psycopg2_Tutorial)
+- Примеры простых консольных приложений с меню для работы с базой данных. [pcnews](https://pcnews.ru/blogs/pisem_konsolnoe_prilozenie_dla_raboty_s_bazoj_dannyh_na_python-1318800.html)
+
+Если хочешь, могу сделать для учителя короткий текстовый отчёт: описание проекта, какие функции реализованы и как пользоваться программой.
