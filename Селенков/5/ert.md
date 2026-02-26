@@ -532,4 +532,11 @@ if __name__ == "__main__":
 - Синтаксис psycopg2 (`connect`, `cursor`, `execute`, `fetchone`, `fetchall`, `commit`, `close`) и пример работы с PostgreSQL. [wiki.postgresql](https://wiki.postgresql.org/wiki/Psycopg2_Tutorial)
 - Примеры простых консольных приложений с меню для работы с базой данных. [pcnews](https://pcnews.ru/blogs/pisem_konsolnoe_prilozenie_dla_raboty_s_bazoj_dannyh_na_python-1318800.html)
 
-Если хочешь, могу сделать для учителя короткий текстовый отчёт: описание проекта, какие функции реализованы и как пользоваться программой.
+
+
+
+
+
+
+
+
