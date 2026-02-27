@@ -766,3 +766,312 @@ def print_movies(movies):
 -  — учебники/конспекты по SQL (INSERT, SELECT, UPDATE, DELETE, COUNT, AVG, SUM, GROUP BY, ORDER BY, COALESCE). [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/170751200/9b9152a5-55cf-4948-b252-a41cb8741d52/5258242982513676994.jpg)
 -  — документация и примеры psycopg2 (connect, cursor, execute, fetchone/fetchall, commit, параметризованные запросы). [selectel](https://selectel.ru/blog/tutorials/postgresql-python/)
 -  — базовый Python: функции, условия, циклы, обработка списков, f‑строки. [github](https://github.com/AndreyRysistov/PostgresHomework)
+***
+***
+***
+***
+***
+***
+***
+***
+***
+***
+***
+***
+
+Ниже разбор каждой функции из твоего кода и указание, какие знания для этого используются. Для ссылок использую номера источников:  
+-  — общие статьи и документация по psycopg2 и CRUD‑операциям с PostgreSQL из Python. [geeksforgeeks](https://www.geeksforgeeks.org/python/perform-postgresql-crud-operations-from-python/)
+-  — примеры `INSERT`, `SELECT`, `UPDATE`, `DELETE`, средних значений и агрегаций. [pynative](https://pynative.com/python-postgresql-insert-update-delete-table-data-to-perform-crud-operations/)
+
+***
+
+## Функция `connect_db`
+
+```python
+def connect_db():
+    try:
+        conn = psycopg2.connect(
+            dbname='shelter_db',
+            user='postgres',
+            password='1111',
+            host='localhost',
+            port='5432'
+        )
+        return conn
+    except Exception as e:
+        print(f'Ошибка подключения к БД: {e}')
+        return None
+```
+
+- `def connect_db():` — объявляет функцию, которая отвечает только за подключение к базе данных, чтобы не дублировать этот код в каждой операции. [w3resource](https://www.w3resource.com/PostgreSQL/snippets/postgresql-psycopg2-guide.php)
+- `try:` — блок, где может произойти ошибка (например, сервер БД не запущен или неверный пароль). [pythonroadmap](https://pythonroadmap.com/blog/psycopg2-crud-python-connect-postgres)
+- `psycopg2.connect(...)` — создаёт соединение с PostgreSQL, используя параметры:  
+  - `dbname='shelter_db'` — имя базы данных;  
+  - `user='postgres'` — пользователь БД;  
+  - `password='1111'` — пароль;  
+  - `host='localhost'` — база на текущем компьютере;  
+  - `port='5432'` — стандартный порт PostgreSQL. [earthly](https://earthly.dev/blog/psycopg2-postgres-python/)
+- `return conn` — если подключение успешно, возвращает объект соединения; его потом используют остальные функции.  
+- `except Exception as e:` — ловит любую ошибку подключения. [pythonroadmap](https://pythonroadmap.com/blog/psycopg2-crud-python-connect-postgres)
+- `print(f'Ошибка подключения к БД: {e}')` — печатает текст ошибки, чтобы проще было понять проблему.  
+- `return None` — при неудаче возвращает `None`, чтобы можно было проверить и при необходимости не продолжать работу.  
+
+***
+
+## Функция `add_animal`
+
+```python
+def add_animal(name, species, breed, age, weight, status, date):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO shelter_logs (name, species, breed, age, weight, status) VALUES (%s, %s, %s, %s, %s, %s)",
+                (name, species, breed, age, weight, status))
+    conn.commit()
+    cur.close()
+    conn.close()
+```
+
+- Параметры функции соответствуют столбцам таблицы: кличка, вид, порода, возраст, вес, статус, дата (хотя дата сейчас в запрос не используется).  
+- `conn = connect_db()` — получает соединение с базой через предыдущую функцию.  
+- `cur = conn.cursor()` — создаёт курсор; это объект, который выполняет SQL‑запросы и возвращает результаты. [geeksforgeeks](https://www.geeksforgeeks.org/python/perform-postgresql-crud-operations-from-python/)
+- `cur.execute("INSERT INTO ... VALUES (%s, ...)", (...))` — выполняет команду вставки:  
+  - `INSERT INTO shelter_logs (name, species, breed, age, weight, status)` — говорит, в какие столбцы вставлять данные. [pythonru](https://pythonru.com/biblioteki/operacii-insert-update-delete-v-postgresql)
+  - `VALUES (%s, %s, %s, %s, %s, %s)` — шесть параметров‑заглушек; реальные значения передаются вторым аргументом функции `execute`.  
+  - `(name, species, breed, age, weight, status)` — кортеж значений для подстановки; такой способ защищает от SQL‑инъекций. [w3resource](https://www.w3resource.com/PostgreSQL/snippets/postgresql-psycopg2-guide.php)
+- `conn.commit()` — подтверждает изменения в базе (фиксирует вставку в таблице). [pynative](https://pynative.com/python-postgresql-insert-update-delete-table-data-to-perform-crud-operations/)
+- `cur.close()` и `conn.close()` — закрывают курсор и соединение, освобождая ресурсы.  
+
+***
+
+## Функция `get_all_animals`
+
+```python
+def get_all_animals():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM shelter_logs")
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result
+```
+
+- `cur.execute("SELECT * FROM shelter_logs")` — выполняет запрос на чтение всех строк и всех столбцов таблицы `shelter_logs`. [pythonru](https://pythonru.com/biblioteki/operacii-insert-update-delete-v-postgresql)
+- `result = cur.fetchall()` — забирает все строки результата в виде списка кортежей. [earthly](https://earthly.dev/blog/psycopg2-postgres-python/)
+- Закрывает курсор и соединение и возвращает список, чтобы его можно было вывести или дополнительно обработать.  
+
+***
+
+## Функция `get_animal_by_id`
+
+```python
+def get_animal_by_id(animal_id):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM shelter_logs WHERE id = %s", (animal_id,))
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return result
+```
+
+- Получает идентификатор животного `animal_id`.  
+- `cur.execute("SELECT * FROM shelter_logs WHERE id = %s", (animal_id,))` — выбирает одну строку, где `id` равен переданному значению. [pynative](https://pynative.com/python-postgresql-insert-update-delete-table-data-to-perform-crud-operations/)
+- `(animal_id,)` — кортеж из одного элемента; такой формат требуют параметризованные запросы psycopg2. [geeksforgeeks](https://www.geeksforgeeks.org/python/perform-postgresql-crud-operations-from-python/)
+- `result = cur.fetchone()` — берёт одну строку результата (либо `None`, если такой записи нет). [earthly](https://earthly.dev/blog/psycopg2-postgres-python/)
+- Возвращает конкретное животное, которое потом заворачивается в список и печатается через `print_animals`.  
+
+***
+
+## Функция `search_by_name`
+
+```python
+def search_by_name(name_part):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM shelter_logs WHERE name ILIKE %s", (f'%{name_part}%',))
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result
+```
+
+- Ищет животных по части клички.  
+- `name_part` — фрагмент имени, который вводит пользователь.  
+- `ILIKE` — оператор в PostgreSQL, который сравнивает строки без учёта регистра (в отличие от `LIKE`). [pythonru](https://pythonru.com/biblioteki/operacii-insert-update-delete-v-postgresql)
+- `f'%{name_part}%'` — шаблон, который позволяет найти вхождение подстроки внутри клички (например, `'Бар'` найдёт `'Барсик'`).  
+- `cur.execute(..., (f'%{name_part}%',))` — параметризованный запрос: строка шаблона передаётся отдельно от SQL.  
+- `cur.fetchall()` — возвращает все найденные записи.  
+
+***
+
+## Функция `update_status`
+
+```python
+def update_status(animal_id, new_status):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("UPDATE shelter_logs SET status = %s WHERE id = %s", (new_status, animal_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+```
+
+- Используется для изменения статуса конкретного животного (например, «Свободен» → «Усыновлен»).  
+- `UPDATE shelter_logs SET status = %s WHERE id = %s` — SQL‑команда обновления поля `status` у строки с указанным `id`. [pynative](https://pynative.com/python-postgresql-insert-update-delete-table-data-to-perform-crud-operations/)
+- `(new_status, animal_id)` — новые значения для параметров запроса.  
+- `conn.commit()` — сохраняет изменение в базе.  
+
+***
+
+## Функция `update_weight`
+
+```python
+def update_weight(animal_id, new_weight):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("UPDATE shelter_logs SET weight = %s WHERE id = %s", (new_weight, animal_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+```
+
+- Логика аналогична предыдущей функции, но обновляется поле `weight` (вес).  
+- Команда `UPDATE` меняет значение веса у записи с нужным `id`, после чего выполняется `commit`. [pythonru](https://pythonru.com/biblioteki/operacii-insert-update-delete-v-postgresql)
+
+***
+
+## Функция `delete_animal`
+
+```python
+def delete_animal(animal_id):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM shelter_logs WHERE id = %s", (animal_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+```
+
+- Удаляет животное из таблицы по его `id`.  
+- `DELETE FROM shelter_logs WHERE id = %s` — SQL‑команда удаления строки. [pynative](https://pynative.com/python-postgresql-insert-update-delete-table-data-to-perform-crud-operations/)
+- `(animal_id,)` — кортеж с одним параметром.  
+- `commit()` фиксирует удаление.  
+
+***
+
+## Функция `get_avg_age`
+
+```python
+def get_avg_age():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT AVG(age) FROM shelter_logs")
+    result = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+    return result
+```
+
+- Считает средний возраст всех животных в приюте.  
+- `SELECT AVG(age) FROM shelter_logs` — агрегатный запрос, который вычисляет среднее значение столбца `age`. [pythonru](https://pythonru.com/biblioteki/operacii-insert-update-delete-v-postgresql)
+- `cur.fetchone()[0]` — берёт первую и единственную колонку из возвращённой строки (значение среднего возраста).  
+- Возвращаемое значение потом показывается в меню как «Средний возраст».  
+
+***
+
+## Функция `count_by_species`
+
+```python
+def count_by_species():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT species, COUNT(*) FROM shelter_logs GROUP BY species")
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result
+```
+
+- Возвращает, сколько животных каждого вида находится в таблице.  
+- `SELECT species, COUNT(*) FROM shelter_logs GROUP BY species` — группирует записи по полю `species` и считает количество строк в каждой группе. [datacarpentry.github](https://datacarpentry.github.io/sql-ecology-lesson/instructor/02-sql-aggregation.html)
+- Результат — список строк вида `('Кошка', 5)`, `('Собака', 3)`; в меню эти значения выводятся по одному.  
+
+***
+
+## Функция `get_adopted_count`
+
+```python
+def get_adopted_count():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM shelter_logs WHERE status = 'Усыновлен'")
+    result = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+    return result
+```
+
+- Считает, сколько животных уже усыновлено.  
+- `SELECT COUNT(*) FROM shelter_logs WHERE status = 'Усыновлен'` — выбирает только строки с нужным статусом и считает их количество. [pynative](https://pynative.com/python-postgresql-insert-update-delete-table-data-to-perform-crud-operations/)
+- `fetchone()[0]` — извлекает значение счётчика.  
+
+***
+
+## Функция `get_youngest_animal`
+
+```python
+def get_youngest_animal():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM shelter_logs ORDER BY age ASC LIMIT 1")
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return result
+```
+
+- Находит самого молодого питомца в приюте.  
+- `ORDER BY age ASC` — сортирует записи по возрасту от меньшего к большему. [pythonru](https://pythonru.com/biblioteki/operacii-insert-update-delete-v-postgresql)
+- `LIMIT 1` — берёт только первую запись (самое маленькое значение возраста).  
+- Возвращает одну строку с полными данными животного.  
+
+***
+
+## Функция `get_heavy_animals`
+
+```python
+def get_heavy_animals():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM shelter_logs WHERE weight > 10")
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result
+```
+
+- Возвращает всех «крупных» животных, вес которых больше 10 кг.  
+- `WHERE weight > 10` — условие фильтрации по столбцу `weight`. [pythonru](https://pythonru.com/biblioteki/operacii-insert-update-delete-v-postgresql)
+- `fetchall()` — список всех подходящих строк.  
+
+***
+
+## Функция `print_animals`
+
+```python
+def print_animals(animals):
+    if not animals:
+        print('Животные не найдены')
+        return
+    for a in animals:
+        print(f"ID: {a[0]} | {a [geeksforgeeks](https://www.geeksforgeeks.org/python/perform-postgresql-crud-operations-from-python/)} ({a [youtube](https://www.youtube.com/watch?v=LL_6XuG0S-Y)}) | Порода: {a [w3resource](https://www.w3resource.com/PostgreSQL/snippets/postgresql-psycopg2-guide.php)} | Возраст: {a [youtube](https://www.youtube.com/watch?v=_7Whpc0qgBk)} лет | Вес: {a [pythonroadmap](https://pythonroadmap.com/blog/psycopg2-crud-python-connect-postgres)} кг | Статус: {a [sqliz](https://www.sqliz.com/posts/python-crud-postgresql/)}")
+```
+
+- Это вспомогательная функция для красивого вывода результатов на экран, она не работает с базой.  
+- `if not animals:` — если список пустой или `None`, выводит сообщение «Животные не найдены» и завершает функцию.  
+- `for a in animals:` — перебирает каждую строку (кортеж) из списка.  
+- Порядок индексов `a[0]..a [sqliz](https://www.sqliz.com/posts/python-crud-postgresql/)` соответствует столбцам таблицы: `id`, `name`, `species`, `breed`, `age`, `weight`, `status`.  
+- f‑строка формирует одну строку с ID, кличкой, видом, породой, возрастом, весом и статусом для удобного чтения.  
+
+Если хочешь, могу дополнительно написать короткое текстовое объяснение для преподавателя: чем отличаются функции «чтение», «изменение», «удаление» и как с помощью этого получается полноценный «учёт животных в приюте».
